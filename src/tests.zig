@@ -1,5 +1,5 @@
 const std = @import("std");
-const functools = @import("functools.zig");
+const functools = @import("functools");
 const testing = std.testing;
 
 const Point2D = struct {

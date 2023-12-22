@@ -1,8 +1,5 @@
 const std = @import("std");
 
-// Although this function looks imperative, note that its job is to
-// declaratively construct a build graph that will be executed by an external
-// runner.
 pub fn build(b: *std.Build) !void {
     // Standard target options allows the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
@@ -22,9 +19,7 @@ pub fn build(b: *std.Build) !void {
     try b.modules.put(b.dupe("functools"), functools);
 
     const lib = b.addSharedLibrary(.{
-        .name = "zig-functools",
-        // In this case the main source file is merely a path, however, in more
-        // complicated build scripts, this could be a generated file.
+        .name = "functools",
         .root_source_file = .{ .path = "src/functools.zig" },
         .target = target,
         .optimize = optimize,
@@ -37,17 +32,13 @@ pub fn build(b: *std.Build) !void {
 
     // Creates a step for unit testing. This only builds the test executable
     // but does not run it.
-    const main_tests = b.addTest(.{
+    const tests = b.addTest(.{
         .root_source_file = .{ .path = "src/tests.zig" },
         .target = target,
         .optimize = optimize,
     });
-
-    const run_main_tests = b.addRunArtifact(main_tests);
-
-    // This creates a build step. It will be visible in the `zig build --help` menu,
-    // and can be selected like this: `zig build test`
-    // This will evaluate the `test` step rather than the default, which is "install".
+    tests.addModule("functools", functools);
+    const run_tests = b.addRunArtifact(tests);
     const test_step = b.step("test", "Run library tests");
-    test_step.dependOn(&run_main_tests.step);
+    test_step.dependOn(&run_tests.step);
 }
