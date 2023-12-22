@@ -8,20 +8,21 @@ pub const FunctoolTypeError = error{
     InvalidReturnType,
 };
 
-/// Map over slice of type `T` using function `func`.
+/// Map over slice of type `T` to slice new slice of type `RT` using function `func` on each element of `slice`.
+/// Usually `T == RT`.
 /// Additionally supply some arguments to `func`,
-pub fn mapSlice(allocator: Allocator, comptime T: type, slice: []const T, comptime func: anytype, args: anytype) ![]T {
+pub fn mapSlice(allocator: Allocator, comptime T: type, comptime RT: type, slice: []const T, comptime func: anytype, args: anytype) ![]RT {
     if (@typeInfo(@TypeOf(func)).Fn.params[0].type.? != T) {
         return FunctoolTypeError.InvalidParamType;
     }
-    if (@typeInfo(@TypeOf(func)).Fn.return_type.? != T) {
+    if (@typeInfo(@TypeOf(func)).Fn.return_type.? != RT) {
         return FunctoolTypeError.InvalidReturnType;
     }
 
-    var mapped_list = try std.ArrayList(T).initCapacity(allocator, slice.len);
+    var mapped_list = try std.ArrayList(RT).initCapacity(allocator, slice.len);
 
     for (0..slice.len) |idx| {
-        const mapped: T = @call(.auto, func, .{slice[idx]} ++ args);
+        const mapped: RT = @call(.auto, func, .{slice[idx]} ++ args);
         try mapped_list.append(mapped);
     }
 

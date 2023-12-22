@@ -27,7 +27,23 @@ test "test map slice on i32 slice without args" {
     const allocator = testing.allocator;
 
     const slice = [3]i32{ 1, 2, 3 };
-    const incremented = try functools.mapSlice(allocator, i32, &slice, inc, .{});
+    const incremented = try functools.mapSlice(allocator, i32, i64, &slice, (struct {
+        fn inci64(n: i32) i64 {
+            return @as(i64, n + 1);
+        }
+    }).inci64, .{});
+    defer allocator.free(incremented);
+
+    try testing.expectEqual(incremented[0], 2);
+    try testing.expectEqual(incremented[1], 3);
+    try testing.expectEqual(incremented[2], 4);
+}
+
+test "test map on slice of type i32 to slice of type i64" {
+    const allocator = testing.allocator;
+
+    const slice = [3]i32{ 1, 2, 3 };
+    const incremented = try functools.mapSlice(allocator, i32, i32, &slice, inc, .{});
     defer allocator.free(incremented);
 
     try testing.expectEqual(incremented[0], 2);
@@ -39,7 +55,7 @@ test "test map slice on i32 slice with args" {
     const allocator = testing.allocator;
     const slice = [3]i32{ 1, 2, 3 };
     var outside_closure: i32 = 0;
-    const added = try functools.mapSlice(allocator, i32, &slice, (struct {
+    const added = try functools.mapSlice(allocator, i32, i32, &slice, (struct {
         fn add(x: i32, y: *i32) i32 {
             y.* += 1;
             return x + y.*;
@@ -155,7 +171,7 @@ test "test wrong param type error" {
     const allocator = testing.allocator;
 
     const slice = [3]i64{ 1, 2, 3 };
-    _ = functools.mapSlice(allocator, i64, &slice, inc, .{}) catch |err| {
+    _ = functools.mapSlice(allocator, i64, i64, &slice, inc, .{}) catch |err| {
         try testing.expect(err == functools.FunctoolTypeError.InvalidParamType);
     };
 }
@@ -164,7 +180,7 @@ test "test wrong return type error" {
     const allocator = testing.allocator;
 
     const slice = [3]i32{ 1, 2, 3 };
-    _ = functools.mapSlice(allocator, i32, &slice, (struct {
+    _ = functools.mapSlice(allocator, i32, i32, &slice, (struct {
         fn inci64(n: i32) i64 {
             return @as(i64, n + 1);
         }
