@@ -1,0 +1,4 @@
+.{
+    .name = "zig-functools",
+    .version = "0.0.1",
+}
