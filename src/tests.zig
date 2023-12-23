@@ -65,6 +65,24 @@ test "test map slice on i32 slice with args" {
     try testing.expectEqual(added[2], 4);
 }
 
+test "test map slice on f32 slice with trunc" {
+    const allocator = testing.allocator;
+    const slice = [4]f32{ 1.9, 2.01, 3.999, 4.5 };
+    const trunced: []f32 = try functools.mapSlice(
+        allocator,
+        f32,
+        &slice,
+        CommonMappers.trunc(f32),
+        .{},
+    );
+    defer allocator.free(trunced);
+
+    try testing.expectEqual(trunced[0], 1);
+    try testing.expectEqual(trunced[1], 2);
+    try testing.expectEqual(trunced[2], 3);
+    try testing.expectEqual(trunced[3], 4);
+}
+
 test "test map slice on Point2D slice with takeField mapper" {
     const allocator = testing.allocator;
     const slice = [3]Point2D{ .{
