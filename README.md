@@ -1,7 +1,7 @@
 # Zig Functools
 A Zig library that provides functional programming tools such as map, reduce and filter.
 ### Add it to your project
-Add this to `build.zig.zon`
+Add the `.functools` dependency to your `build.zig.zon`.
 ```zig
 .{
     .name = "Your project name",
@@ -21,13 +21,15 @@ const functools = b.dependency("functools", .{
         .optimize = optimize,
     });
 exe.addModule("functools", functools.module("functools"));
+// Or, if you are building a library
+// lib.addModule("functools", functools.module("functools"));
 ```
-The library can now be imported as a module with
+The library can now be imported as a module.
 ```zig
 const functools = @import("functools");
 ```
 ### Examples
-The [tests](./src/tests.zig) are some examples of how to use the library, below are some quick examples from the tests to give an idea. <br>
+The [tests](./src/tests.zig) are some examples of how to use the library, below are some simple examples from the tests. <br> <br>
 **Map over slice and increment each element.**
 ```zig
 test "test map slice on i32 slice without args " {
@@ -38,7 +40,7 @@ test "test map slice on i32 slice without args " {
         allocator,
         i32,
         &slice,
-        CommonMappers.inc(i32),
+        functools.CommonMappers.inc(i32),
         .{},
     );
     defer allocator.free(incremented);
@@ -57,7 +59,7 @@ test "test filter on i32 slice" {
         allocator,
         i32,
         &slice,
-        CommonPredicates.even(i32),
+        functools.CommonPredicates.even(i32),
         .{},
     );
     defer allocator.free(even);
