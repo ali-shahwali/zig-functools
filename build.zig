@@ -30,6 +30,40 @@ pub fn build(b: *std.Build) !void {
     // running `zig build`).
     b.installArtifact(lib);
 
+    inline for ([_]struct {
+        name: []const u8,
+        run_step_name: []const u8,
+        description: []const u8,
+        path: []const u8,
+    }{
+        .{
+            .name = "map",
+            .run_step_name = "bench-map",
+            .description = "benchmark the map function",
+            .path = "benchmarks/map.zig",
+        },
+        .{
+            .name = "reduce",
+            .run_step_name = "bench-reduce",
+            .description = "benchmark the reduce function",
+            .path = "benchmarks/reduce.zig",
+        },
+    }) |config| {
+        const bench_run_step = b.step(config.run_step_name, config.description);
+
+        var bench = b.addExecutable(.{
+            .name = config.name,
+            .root_source_file = .{ .path = config.path },
+            .target = target,
+            .optimize = optimize,
+        });
+
+        bench.addModule("functools", functools);
+
+        const bench_run = b.addRunArtifact(bench);
+        bench_run_step.dependOn(&bench_run.step);
+    }
+
     // Creates a step for unit testing. This only builds the test executable
     // but does not run it.
     const tests = b.addTest(.{
