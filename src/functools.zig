@@ -161,3 +161,20 @@ pub fn takeNth(allocator: Allocator, comptime T: type, slice: []const T, n: usiz
     const nth_slice = try nth.toOwnedSlice();
     return nth_slice;
 }
+
+/// Returns a slice of length `n` and type `T` where the elements start from 0 and go to n - 1.
+/// ```zig
+/// // Example
+/// const slice = functools.range(i32, 4);
+/// try testing.expectEqualSlices(i32, &slice, &[_]i32{ 0, 1, 2, 3 });
+/// ```
+pub fn range(comptime T: type, comptime n: usize) [n]T {
+    var slice: [n]T = undefined;
+    var idx: T = 0;
+    for (0..n) |i| {
+        slice[i] = idx;
+        idx += 1;
+    }
+
+    return slice;
+}

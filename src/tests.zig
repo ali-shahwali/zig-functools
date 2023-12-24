@@ -25,9 +25,7 @@ test "test map on slice of type i32 to slice of type i64" {
     }).inci64, .{});
     defer allocator.free(incremented);
 
-    try testing.expectEqual(incremented[0], 2);
-    try testing.expectEqual(incremented[1], 3);
-    try testing.expectEqual(incremented[2], 4);
+    try testing.expectEqualSlices(i64, incremented, &[_]i64{ 2, 3, 4 });
 }
 
 test "test map mutable slice on i32 slice without args " {
@@ -39,9 +37,7 @@ test "test map mutable slice on i32 slice without args " {
         .{},
     );
 
-    try testing.expectEqual(slice[0], 2);
-    try testing.expectEqual(slice[1], 3);
-    try testing.expectEqual(slice[2], 4);
+    try testing.expectEqualSlices(i32, &slice, &[_]i32{ 2, 3, 4 });
 }
 
 test "test map slice on i32 slice with args" {
@@ -56,9 +52,7 @@ test "test map slice on i32 slice with args" {
     );
     defer allocator.free(added);
 
-    try testing.expectEqual(added[0], 2);
-    try testing.expectEqual(added[1], 3);
-    try testing.expectEqual(added[2], 4);
+    try testing.expectEqualSlices(i32, added, &[_]i32{ 2, 3, 4 });
 }
 
 test "test map slice on f32 slice with trunc" {
@@ -73,10 +67,7 @@ test "test map slice on f32 slice with trunc" {
     );
     defer allocator.free(trunced);
 
-    try testing.expectEqual(trunced[0], 1);
-    try testing.expectEqual(trunced[1], 2);
-    try testing.expectEqual(trunced[2], 3);
-    try testing.expectEqual(trunced[3], 4);
+    try testing.expectEqualSlices(f32, trunced, &[_]f32{ 1, 2, 3, 4 });
 }
 
 test "test map slice on Point2D slice with takeField mapper" {
@@ -100,9 +91,7 @@ test "test map slice on Point2D slice with takeField mapper" {
     );
     defer allocator.free(x_coords);
 
-    try testing.expectEqual(x_coords[0], 1);
-    try testing.expectEqual(x_coords[1], 2);
-    try testing.expectEqual(x_coords[2], 3);
+    try testing.expectEqualSlices(i32, x_coords, &[_]i32{ 1, 2, 3 });
 }
 
 test "test reduce slice on i32 slice" {
@@ -147,9 +136,7 @@ test "test filter on i32 slice" {
     );
     defer allocator.free(even);
 
-    try testing.expectEqual(even[0], 2);
-    try testing.expectEqual(even[1], 4);
-    try testing.expectEqual(even.len, 2);
+    try testing.expectEqualSlices(i32, even, &[_]i32{ 2, 4 });
 }
 
 test "test some on i32 slice" {
@@ -231,4 +218,9 @@ test "test wrong param type error" {
     ) catch |err| {
         try testing.expect(err == functools.FunctoolTypeError.InvalidParamType);
     };
+}
+
+test "test range" {
+    const slice = functools.range(i32, 4);
+    try testing.expectEqualSlices(i32, &slice, &[_]i32{ 0, 1, 2, 3 });
 }

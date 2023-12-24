@@ -250,4 +250,22 @@ pub const CommonPredicates = struct {
             }
         }).apply;
     }
+
+    /// Evalatues `true` if `item` is greater than 0.
+    pub fn pos(comptime T: type) fn (item: T) bool {
+        return (struct {
+            fn apply(item: T) bool {
+                return item > 0;
+            }
+        }).apply;
+    }
+
+    /// Evalatues `true` if `item` is less than 0.
+    pub fn neg(comptime T: type) fn (item: T) bool {
+        return (struct {
+            fn apply(item: T) bool {
+                return item < 0;
+            }
+        }).apply;
+    }
 };
