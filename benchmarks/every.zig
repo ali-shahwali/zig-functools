@@ -4,30 +4,27 @@ const time = std.time;
 
 const TEST_SIZE = 90000000;
 
-fn inc(n: i32) i32 {
-    return n + 1;
-}
-
 pub fn main() !void {
-    std.debug.print("Testing mapMutSlice with {d} elements.\n\n", .{TEST_SIZE});
+    std.debug.print("Testing everySlice with {d} elements.\n\n", .{TEST_SIZE});
 
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
 
     const allocator = arena.allocator();
 
-    const data = try allocator.alloc(i32, TEST_SIZE);
+    const data = try allocator.alloc(i64, TEST_SIZE);
+    var result: bool = undefined;
 
-    @memset(data, 0);
+    @memset(data, 1);
 
     var end_time: i64 = undefined;
     var start_time = time.milliTimestamp();
 
-    functools.mapMutSlice(
-        i32,
+    result = try functools.everySlice(
+        i64,
         data,
-        functools.CommonMappers.inc(i32),
-        .{},
+        functools.CommonPredicates.eq(i64),
+        .{@as(i64, 1)},
     );
 
     end_time = time.milliTimestamp();
@@ -35,16 +32,17 @@ pub fn main() !void {
     const functools_time: i64 = end_time - start_time;
     std.debug.print("With functools: {d}ms.\n", .{functools_time});
 
-    @memset(data, 0);
-
     start_time = time.milliTimestamp();
 
+    result = true;
     for (0..TEST_SIZE) |i| {
-        data[i] = inc(data[i]);
+        if (data[i] != 1) {
+            result = false;
+            break;
+        }
     }
 
     end_time = time.milliTimestamp();
-
     const manual_time: i64 = end_time - start_time;
     std.debug.print("Without functools: {d}ms.\n\n", .{manual_time});
 

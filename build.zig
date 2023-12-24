@@ -48,6 +48,12 @@ pub fn build(b: *std.Build) !void {
             .description = "benchmark the reduce function",
             .path = "benchmarks/reduce.zig",
         },
+        .{
+            .name = "every",
+            .run_step_name = "bench-every",
+            .description = "benchmark the every function",
+            .path = "benchmarks/every.zig",
+        },
     }) |config| {
         const bench_run_step = b.step(config.run_step_name, config.description);
 

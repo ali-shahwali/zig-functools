@@ -30,22 +30,18 @@ test "test map on slice of type i32 to slice of type i64" {
     try testing.expectEqual(incremented[2], 4);
 }
 
-test "test map slice on i32 slice without args " {
-    const allocator = testing.allocator;
-
-    const slice = [3]i32{ 1, 2, 3 };
-    const incremented = try functools.mapSlice(
-        allocator,
+test "test map mutable slice on i32 slice without args " {
+    var slice = [3]i32{ 1, 2, 3 };
+    functools.mapMutSlice(
         i32,
         &slice,
         CommonMappers.inc(i32),
         .{},
     );
-    defer allocator.free(incremented);
 
-    try testing.expectEqual(incremented[0], 2);
-    try testing.expectEqual(incremented[1], 3);
-    try testing.expectEqual(incremented[2], 4);
+    try testing.expectEqual(slice[0], 2);
+    try testing.expectEqual(slice[1], 3);
+    try testing.expectEqual(slice[2], 4);
 }
 
 test "test map slice on i32 slice with args" {
