@@ -25,14 +25,11 @@ pub fn mapSlice(allocator: Allocator, comptime T: type, slice: []const T, compti
         return FunctoolTypeError.InvalidReturnType;
     };
 
-    var mapped_list = try std.ArrayList(ReturnType).initCapacity(allocator, slice.len);
-
+    var mapped_slice = try allocator.alloc(ReturnType, slice.len);
     for (0..slice.len) |idx| {
-        const mapped: ReturnType = @call(.auto, func, .{slice[idx]} ++ args);
-        try mapped_list.append(mapped);
+        mapped_slice[idx] = @call(.auto, func, .{slice[idx]} ++ args);
     }
 
-    const mapped_slice = try mapped_list.toOwnedSlice();
     return mapped_slice;
 }
 
@@ -67,8 +64,8 @@ pub fn reduceSlice(comptime T: type, comptime RT: type, slice: []const T, compti
 
     var accumulator: RT = initial_value;
 
-    for (0..slice.len) |idx| {
-        accumulator = @call(.auto, func, .{ accumulator, slice[idx] } ++ args);
+    for (slice[0..]) |item| {
+        accumulator = @call(.auto, func, .{ accumulator, item } ++ args);
     }
 
     return accumulator;
@@ -87,17 +84,17 @@ pub fn filterSlice(allocator: std.mem.Allocator, comptime T: type, slice: []cons
         }
     }
 
-    var filtered_list = try std.ArrayList(T).initCapacity(allocator, slice.len);
-
-    for (0..slice.len) |idx| {
-        const filtered: bool = @call(.auto, pred, .{slice[idx]} ++ args);
-        if (filtered) {
-            try filtered_list.append(slice[idx]);
+    var filtered = try allocator.alloc(T, slice.len);
+    var filtered_len: usize = 0;
+    for (slice[0..]) |item| {
+        if (@call(.auto, pred, .{item} ++ args)) {
+            filtered[filtered_len] = item;
+            filtered_len += 1;
         }
     }
 
-    const filtered_slice = try filtered_list.toOwnedSlice();
-    return filtered_slice;
+    _ = allocator.resize(filtered, filtered_len);
+    return filtered[0..filtered_len];
 }
 
 /// Returns true if `slice` contains an item of type `T` that passes the predicate specified by `pred`.
@@ -112,9 +109,8 @@ pub fn someSlice(comptime T: type, slice: []const T, comptime pred: anytype, arg
         }
     }
 
-    for (0..slice.len) |idx| {
-        const pred_result: bool = @call(.auto, pred, .{slice[idx]} ++ args);
-        if (pred_result) {
+    for (slice[0..]) |item| {
+        if (@call(.auto, pred, .{item} ++ args)) {
             return true;
         }
     }
@@ -134,9 +130,8 @@ pub fn everySlice(comptime T: type, slice: []const T, comptime pred: anytype, ar
         }
     }
 
-    for (0..slice.len) |idx| {
-        const pred_result: bool = @call(.auto, pred, .{slice[idx]} ++ args);
-        if (!pred_result) {
+    for (slice[0..]) |item| {
+        if (!@call(.auto, pred, .{item} ++ args)) {
             return false;
         }
     }
@@ -146,20 +141,23 @@ pub fn everySlice(comptime T: type, slice: []const T, comptime pred: anytype, ar
 
 /// Take every nth element in `slice` of type `T`.
 /// Consumer of function must make sure to free returned slice.
+/// A special case is n <= 0, in which case the same slice will be returned.
 pub fn takeNth(allocator: Allocator, comptime T: type, slice: []const T, n: usize) ![]T {
     if (n <= 0) {
-        return slice;
+        var copy = try allocator.alloc(T, slice.len);
+        @memcpy(copy, slice);
+        return copy;
     }
 
-    var nth = std.ArrayList(T).init(allocator);
-    for (0..slice.len) |idx| {
-        if (@mod(idx, n) == 0) {
-            try nth.append(slice[idx]);
-        }
+    var nth = try allocator.alloc(T, @divFloor(slice.len, n));
+    var j: usize = 0;
+    var i: usize = 0;
+    while (i < slice.len) : (i += n) {
+        nth[j] = slice[i];
+        j += 1;
     }
 
-    const nth_slice = try nth.toOwnedSlice();
-    return nth_slice;
+    return nth;
 }
 
 /// Returns a slice of length `n` and type `T` where the elements start from 0 and go to n - 1.
@@ -168,8 +166,8 @@ pub fn takeNth(allocator: Allocator, comptime T: type, slice: []const T, n: usiz
 /// const slice = functools.range(i32, 4);
 /// try testing.expectEqualSlices(i32, &slice, &[_]i32{ 0, 1, 2, 3 });
 /// ```
-pub fn range(comptime T: type, comptime n: usize) [n]T {
-    var slice: [n]T = undefined;
+pub fn rangeSlice(allocator: std.mem.Allocator, comptime T: type, comptime n: usize) ![]T {
+    var slice = try allocator.alloc(T, n);
     var idx: T = 0;
     for (0..n) |i| {
         slice[i] = idx;

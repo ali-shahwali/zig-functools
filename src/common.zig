@@ -147,9 +147,9 @@ pub const CommonMappers = struct {
     }
 
     /// Strip item of all but one field supplied by args. The field type must also be provided.
-    pub fn takeField(comptime T: type, comptime FT: type) fn (item: T, comptime field: []const u8) FT {
+    pub fn takeField(comptime T: type, comptime FieldType: type) fn (item: T, comptime field: []const u8) FieldType {
         return (struct {
-            fn apply(item: T, comptime field: []const u8) FT {
+            fn apply(item: T, comptime field: []const u8) FieldType {
                 return @field(item, field);
             }
         }).apply;

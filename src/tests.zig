@@ -28,8 +28,8 @@ test "test map on slice of type i32 to slice of type i64" {
     try testing.expectEqualSlices(i64, incremented, &[_]i64{ 2, 3, 4 });
 }
 
-test "test map mutable slice on i32 slice without args " {
-    var slice = [3]i32{ 1, 2, 3 };
+test "test map mutable slice on i32 slice without args" {
+    var slice = [_]i32{ 1, 2, 3 };
     functools.mapMutSlice(
         i32,
         &slice,
@@ -42,7 +42,7 @@ test "test map mutable slice on i32 slice without args " {
 
 test "test map slice on i32 slice with args" {
     const allocator = testing.allocator;
-    const slice = [3]i32{ 1, 2, 3 };
+    const slice = [_]i32{ 1, 2, 3 };
     const added: []i32 = try functools.mapSlice(
         allocator,
         i32,
@@ -57,7 +57,7 @@ test "test map slice on i32 slice with args" {
 
 test "test map slice on f32 slice with trunc" {
     const allocator = testing.allocator;
-    const slice = [4]f32{ 1.9, 2.01, 3.999, 4.5 };
+    const slice = [_]f32{ 1.9, 2.01, 3.999, 4.5 };
     const trunced: []f32 = try functools.mapSlice(
         allocator,
         f32,
@@ -72,7 +72,7 @@ test "test map slice on f32 slice with trunc" {
 
 test "test map slice on Point2D slice with takeField mapper" {
     const allocator = testing.allocator;
-    const slice = [3]Point2D{ .{
+    const slice = [_]Point2D{ .{
         .x = 1,
         .y = 2,
     }, .{
@@ -95,7 +95,7 @@ test "test map slice on Point2D slice with takeField mapper" {
 }
 
 test "test reduce slice on i32 slice" {
-    const slice = [3]i32{ 1, 2, 3 };
+    const slice = [_]i32{ 1, 2, 3 };
     const result = try functools.reduceSlice(
         i32,
         i32,
@@ -109,7 +109,7 @@ test "test reduce slice on i32 slice" {
 }
 
 test "test reduce struct field" {
-    const slice = [3]Point2D{ .{
+    const slice = [_]Point2D{ .{
         .x = 1,
         .y = 2,
     }, .{
@@ -125,7 +125,7 @@ test "test reduce struct field" {
 }
 
 test "test filter on i32 slice" {
-    const slice = [5]i32{ 1, 2, 3, 4, 5 };
+    const slice = [_]i32{ 1, 2, 3, 4, 5 };
     const allocator = testing.allocator;
     const even = try functools.filterSlice(
         allocator,
@@ -140,7 +140,7 @@ test "test filter on i32 slice" {
 }
 
 test "test some on i32 slice" {
-    const slice = [3]i32{ 1, 3, 5 };
+    const slice = [_]i32{ 1, 3, 5 };
     const some_even = try functools.someSlice(
         i32,
         &slice,
@@ -156,7 +156,7 @@ fn orthogonal(p1: Point2D, p2: Point2D) bool {
 }
 
 test "test some on Point2D slice" {
-    const slice = [3]Point2D{
+    const slice = [_]Point2D{
         .{
             .x = 5,
             .y = 2,
@@ -181,7 +181,7 @@ test "test some on Point2D slice" {
 }
 
 test "test every on Point2D slice" {
-    const slice = [3]Point2D{
+    const slice = [_]Point2D{
         .{
             .x = 0,
             .y = 1,
@@ -205,10 +205,20 @@ test "test every on Point2D slice" {
     try testing.expect(!every_orthogonal);
 }
 
+test "test takeNth" {
+    const allocator = testing.allocator;
+
+    const slice = [_]i32{ 0, 1, 2, 3, 4, 5 };
+    const nth = try functools.takeNth(allocator, i32, &slice, 2);
+    defer allocator.free(nth);
+
+    try testing.expectEqualSlices(i32, nth, &[_]i32{ 0, 2, 4 });
+}
+
 test "test wrong param type error" {
     const allocator = testing.allocator;
 
-    const slice = [3]i64{ 1, 2, 3 };
+    const slice = [_]i64{ 1, 2, 3 };
     _ = functools.mapSlice(
         allocator,
         i64,
@@ -220,7 +230,11 @@ test "test wrong param type error" {
     };
 }
 
-test "test range" {
-    const slice = functools.range(i32, 4);
-    try testing.expectEqualSlices(i32, &slice, &[_]i32{ 0, 1, 2, 3 });
+test "test range slice" {
+    const allocator = testing.allocator;
+
+    const slice = try functools.rangeSlice(allocator, i32, 4);
+    defer allocator.free(slice);
+
+    try testing.expectEqualSlices(i32, slice, &[_]i32{ 0, 1, 2, 3 });
 }

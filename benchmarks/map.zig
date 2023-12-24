@@ -1,6 +1,9 @@
 const std = @import("std");
 const functools = @import("functools");
 const time = std.time;
+const print = std.debug.print;
+const util = @import("util.zig");
+const Chameleon = @import("chameleon").Chameleon;
 
 const TEST_SIZE = 90000000;
 
@@ -8,46 +11,51 @@ fn inc(n: i32) i32 {
     return n + 1;
 }
 
-pub fn main() !void {
-    std.debug.print("Testing mapMutSlice with {d} elements.\n\n", .{TEST_SIZE});
-
-    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    defer arena.deinit();
-
-    const allocator = arena.allocator();
-
-    const data = try allocator.alloc(i32, TEST_SIZE);
-
-    @memset(data, 0);
-
-    var end_time: i64 = undefined;
-    var start_time = time.milliTimestamp();
-
+fn withMapMutSlice(data: []i32) void {
     functools.mapMutSlice(
         i32,
         data,
         functools.CommonMappers.inc(i32),
         .{},
     );
+}
 
-    end_time = time.milliTimestamp();
-
-    const functools_time: i64 = end_time - start_time;
-    std.debug.print("With functools: {d}ms.\n", .{functools_time});
-
-    @memset(data, 0);
-
-    start_time = time.milliTimestamp();
-
+fn withoutMap(data: []i32) void {
     for (0..TEST_SIZE) |i| {
         data[i] = inc(data[i]);
     }
+}
 
-    end_time = time.milliTimestamp();
+pub fn benchmark(allocator: std.mem.Allocator) !void {
+    comptime var cham = Chameleon.init(.Auto);
 
-    const manual_time: i64 = end_time - start_time;
-    std.debug.print("Without functools: {d}ms.\n\n", .{manual_time});
+    print(cham.blue().bold().fmt("Benchmarking mapMutSlice with {d} elements.\n"), .{TEST_SIZE});
 
-    const overhead: f64 = @as(f64, @floatFromInt(functools_time)) / @as(f64, @floatFromInt(manual_time));
-    std.debug.print("Functool incurs a {d:.2}x overhead.", .{overhead});
+    const data = try allocator.alloc(i32, TEST_SIZE);
+
+    @memset(data, 0);
+
+    const map_mut_slice_time = util.benchMilli(
+        "With mapSlice",
+        withMapMutSlice,
+        .{data},
+    );
+
+    @memset(data, 0);
+
+    const manual_time = util.benchMilli(
+        "Without functools",
+        withoutMap,
+        .{data},
+    );
+
+    util.printComparison(i64, "mapMutSlice", map_mut_slice_time, manual_time);
+}
+
+pub fn main() !void {
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer arena.deinit();
+
+    const allocator = arena.allocator();
+    try benchmark(allocator);
 }

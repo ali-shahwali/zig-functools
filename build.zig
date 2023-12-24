@@ -1,16 +1,46 @@
 const std = @import("std");
 
+const Benchmark = struct {
+    name: []const u8,
+    run_step_name: []const u8,
+    description: []const u8,
+    path: []const u8,
+};
+
+const benchmarks = [_]Benchmark{
+    .{
+        .name = "map",
+        .run_step_name = "bench-map",
+        .description = "Benchmark the map function",
+        .path = "benchmarks/map.zig",
+    },
+    .{
+        .name = "reduce",
+        .run_step_name = "bench-reduce",
+        .description = "Benchmark the reduce function",
+        .path = "benchmarks/reduce.zig",
+    },
+    .{
+        .name = "every",
+        .run_step_name = "bench-every",
+        .description = "Benchmark the every function",
+        .path = "benchmarks/every.zig",
+    },
+    .{
+        .name = "filter-impl",
+        .run_step_name = "bench-filter-impl",
+        .description = "Benchmark the 2 different filter implementations",
+        .path = "benchmarks/filter_impl.zig",
+    },
+};
+
 pub fn build(b: *std.Build) !void {
-    // Standard target options allows the person running `zig build` to choose
-    // what target to build for. Here we do not override the defaults, which
-    // means any target is allowed, and the default is native. Other options
-    // for restricting supported target set are available.
     const target = b.standardTargetOptions(.{});
 
-    // Standard optimization options allow the person running `zig build` to select
-    // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall. Here we do not
-    // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
+
+    const cham_dep = b.dependency("chameleon", .{});
+    const cham = cham_dep.module("chameleon");
 
     var functools = b.createModule(.{
         .source_file = .{ .path = "src/functools.zig" },
@@ -25,53 +55,38 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
 
-    // This declares intent for the library to be installed into the standard
-    // location when the user invokes the "install" step (the default step when
-    // running `zig build`).
     b.installArtifact(lib);
 
-    inline for ([_]struct {
-        name: []const u8,
-        run_step_name: []const u8,
-        description: []const u8,
-        path: []const u8,
-    }{
-        .{
-            .name = "map",
-            .run_step_name = "bench-map",
-            .description = "benchmark the map function",
-            .path = "benchmarks/map.zig",
-        },
-        .{
-            .name = "reduce",
-            .run_step_name = "bench-reduce",
-            .description = "benchmark the reduce function",
-            .path = "benchmarks/reduce.zig",
-        },
-        .{
-            .name = "every",
-            .run_step_name = "bench-every",
-            .description = "benchmark the every function",
-            .path = "benchmarks/every.zig",
-        },
-    }) |config| {
+    const bench_all_step = b.step("bench-all", "Run all benchmarks");
+
+    var bench_all = b.addExecutable(.{
+        .name = "bench-all",
+        .root_source_file = .{ .path = "benchmarks/all.zig" },
+        .target = target,
+        .optimize = .ReleaseSafe,
+    });
+    bench_all.addModule("functools", functools);
+    bench_all.addModule("chameleon", cham);
+
+    const bench_all_run = b.addRunArtifact(bench_all);
+    bench_all_step.dependOn(&bench_all_run.step);
+
+    inline for (benchmarks) |config| {
         const bench_run_step = b.step(config.run_step_name, config.description);
 
         var bench = b.addExecutable(.{
             .name = config.name,
             .root_source_file = .{ .path = config.path },
             .target = target,
-            .optimize = optimize,
+            .optimize = .ReleaseSafe,
         });
-
         bench.addModule("functools", functools);
+        bench.addModule("chameleon", cham);
 
         const bench_run = b.addRunArtifact(bench);
         bench_run_step.dependOn(&bench_run.step);
     }
 
-    // Creates a step for unit testing. This only builds the test executable
-    // but does not run it.
     const tests = b.addTest(.{
         .root_source_file = .{ .path = "src/tests.zig" },
         .target = target,

@@ -1,48 +1,62 @@
 const std = @import("std");
 const functools = @import("functools");
 const time = std.time;
+const print = std.debug.print;
+const util = @import("util.zig");
+const Chameleon = @import("chameleon").Chameleon;
 
 const TEST_SIZE = 90000000;
 
-pub fn main() !void {
-    std.debug.print("Testing reduceSlice with {d} elements.\n\n", .{TEST_SIZE});
+fn printResult(method: []const u8, t1: i64, t2: i64) void {
+    const overhead: f64 = @as(f64, @floatFromInt(t1)) / @as(f64, @floatFromInt(t2));
+    if (overhead < 1) {
+        print("{s} incurs a {d:.2}% speedup.\n", .{ method, (1 - overhead) * 100 });
+    } else {
+        print("{s} incurs a {d:.2}% overhead.\n", .{ method, (overhead - 1) * 100 });
+    }
+}
 
-    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    defer arena.deinit();
-
-    const allocator = arena.allocator();
-
-    const data = try allocator.alloc(i64, TEST_SIZE);
-    var reduced: i64 = undefined;
-
-    @memset(data, 1);
-
-    var end_time: i64 = undefined;
-    var start_time = time.milliTimestamp();
-
-    reduced = try functools.reduceSlice(
+fn withReduce(data: []const i64) i64 {
+    return functools.reduceSlice(
         i64,
         i64,
         data,
         functools.CommonReducers.sum(i64),
         .{},
         0,
-    );
+    ) catch unreachable;
+}
 
-    end_time = time.milliTimestamp();
-    const functools_time: i64 = end_time - start_time;
-    std.debug.print("With functools: {d}ms.\n", .{functools_time});
-
-    start_time = time.milliTimestamp();
-
-    for (0..TEST_SIZE) |i| {
-        reduced += data[i];
+fn withoutReduce(data: []const i64) i64 {
+    var reduced: i64 = 0;
+    for (data[0..]) |item| {
+        reduced += item;
     }
 
-    end_time = time.milliTimestamp();
-    const manual_time: i64 = end_time - start_time;
-    std.debug.print("Without functools: {d}ms.\n\n", .{manual_time});
+    return reduced;
+}
 
-    const overhead: f64 = @as(f64, @floatFromInt(functools_time)) / @as(f64, @floatFromInt(manual_time));
-    std.debug.print("Functool incurs a {d:.2}x overhead.", .{overhead});
+pub fn benchmark(allocator: std.mem.Allocator) !void {
+    comptime var cham = Chameleon.init(.Auto);
+
+    print(cham.blue().bold().fmt("Benchmarking reduceSlice with {d} elements.\n"), .{TEST_SIZE});
+
+    const data = try allocator.alloc(i64, TEST_SIZE);
+
+    @memset(data, 1);
+
+    const reduce_slice_time: i64 = util.benchMilli("With functools", withReduce, .{data});
+
+    const manual_time: i64 = util.benchMilli("Without functools", withoutReduce, .{data});
+
+    util.printComparison(i64, "reduceSlice", reduce_slice_time, manual_time);
+}
+
+pub fn main() !void {
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer arena.deinit();
+
+    const allocator = arena.allocator();
+
+    try benchmark(allocator);
 }

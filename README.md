@@ -29,48 +29,45 @@ The library can now be imported as a module.
 const functools = @import("functools");
 ```
 ### Examples
-The [tests](./src/tests.zig) are some examples of how to use the library, below are some simple examples from the tests. <br> <br>
+The [tests](./src/tests.zig) are good examples of how to use the library, below are some simple examples from the tests. <br> <br>
 **Map over slice and increment each element.**
 ```zig
-test "test map slice on i32 slice without args " {
-    const allocator = testing.allocator;
-
-    const slice = [3]i32{ 1, 2, 3 };
-    const incremented = try functools.mapSlice(
-        allocator,
+test "test map mutable slice on i32 slice without args" {
+    var slice = [3]i32{ 1, 2, 3 };
+    functools.mapMutSlice(
         i32,
         &slice,
-        functools.CommonMappers.inc(i32),
+        CommonMappers.inc(i32),
         .{},
     );
-    defer allocator.free(incremented);
 
-    try testing.expectEqual(incremented[0], 2);
-    try testing.expectEqual(incremented[1], 3);
-    try testing.expectEqual(incremented[2], 4);
+    try testing.expectEqualSlices(i32, &slice, &[_]i32{ 2, 3, 4 });
 }
 ```
 **Filter even integers.**
 ```zig
 test "test filter on i32 slice" {
-    const slice = [5]i32{ 1, 2, 3, 4, 5 };
+    const slice = [_]i32{ 1, 2, 3, 4, 5 };
     const allocator = testing.allocator;
     const even = try functools.filterSlice(
         allocator,
         i32,
         &slice,
-        functools.CommonPredicates.even(i32),
+        CommonPredicates.even(i32),
         .{},
     );
     defer allocator.free(even);
 
-    try testing.expectEqual(even[0], 2);
-    try testing.expectEqual(even[1], 4);
-    try testing.expectEqual(even.len, 2);
+    try testing.expectEqualSlices(i32, even, &[_]i32{ 2, 4 });
 }
 ```
 **Check that every vector is orthogonal to the x basis vector.**
 ```zig
+const Point2D = struct {
+    x: i32,
+    y: i32,
+};
+
 fn orthogonal(p1: Point2D, p2: Point2D) bool {
     return (p1.x * p2.x + p1.y * p2.y) == 0;
 }
