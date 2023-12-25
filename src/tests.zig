@@ -94,6 +94,32 @@ test "test map slice on Point2D slice with takeField mapper" {
     try testing.expectEqualSlices(i32, x_coords, &[_]i32{ 1, 2, 3 });
 }
 
+test "test map i32 slice to Point2D slice" {
+    const allocator = testing.allocator;
+    const slice = [_]i32{ 1, 2, 3 };
+    const points: []Point2D = try functools.mapSlice(
+        allocator,
+        i32,
+        &slice,
+        (struct {
+            fn toPoint2D(n: i32) Point2D {
+                return Point2D{
+                    .x = n,
+                    .y = 0,
+                };
+            }
+        }).toPoint2D,
+        .{},
+    );
+    defer allocator.free(points);
+
+    try testing.expectEqualSlices(Point2D, points, &[_]Point2D{
+        .{ .x = 1, .y = 0 },
+        .{ .x = 2, .y = 0 },
+        .{ .x = 3, .y = 0 },
+    });
+}
+
 test "test reduce slice on i32 slice" {
     const slice = [_]i32{ 1, 2, 3 };
     const result = try functools.reduceSlice(
@@ -109,17 +135,15 @@ test "test reduce slice on i32 slice" {
 }
 
 test "test reduce struct field" {
-    const slice = [_]Point2D{ .{
-        .x = 1,
-        .y = 2,
-    }, .{
-        .x = 2,
-        .y = 3,
-    }, .{
-        .x = 3,
-        .y = 4,
-    } };
-    const result = try functools.reduceSlice(Point2D, i32, &slice, sumPointY, .{}, 0);
+    const slice = [_]Point2D{ .{ .x = 1, .y = 2 }, .{ .x = 2, .y = 3 }, .{ .x = 3, .y = 4 } };
+    const result = try functools.reduceSlice(
+        Point2D,
+        i32,
+        &slice,
+        sumPointY,
+        .{},
+        0,
+    );
 
     try testing.expectEqual(result, 9);
 }
@@ -137,6 +161,24 @@ test "test filter on i32 slice" {
     defer allocator.free(even);
 
     try testing.expectEqualSlices(i32, even, &[_]i32{ 2, 4 });
+}
+
+test "test filter on Point2D slice" {
+    const slice = [_]Point2D{ .{ .x = 2, .y = 2 }, .{ .x = 0, .y = 3 }, .{ .x = 2, .y = 4 } };
+    const allocator = testing.allocator;
+    const x_coord_eq_2 = try functools.filterSlice(
+        allocator,
+        Point2D,
+        &slice,
+        CommonPredicates.fieldEq(Point2D, i32),
+        .{ "x", 2 },
+    );
+    defer allocator.free(x_coord_eq_2);
+
+    try testing.expectEqualSlices(Point2D, x_coord_eq_2, &[_]Point2D{
+        .{ .x = 2, .y = 2 },
+        .{ .x = 2, .y = 4 },
+    });
 }
 
 test "test some on i32 slice" {
@@ -157,24 +199,12 @@ fn orthogonal(p1: Point2D, p2: Point2D) bool {
 
 test "test some on Point2D slice" {
     const slice = [_]Point2D{
-        .{
-            .x = 5,
-            .y = 2,
-        },
-        .{
-            .x = 1,
-            .y = 3,
-        },
-        // This one is orthogonal to (1, 0)
-        .{
-            .x = 0,
-            .y = 4,
-        },
+        .{ .x = 5, .y = 2 },
+        .{ .x = 1, .y = 3 },
+        .{ .x = 0, .y = 4 }, // This one is orthogonal to (1, 0)
     };
-    const e_x = Point2D{
-        .x = 1,
-        .y = 0,
-    };
+
+    const e_x = Point2D{ .x = 1, .y = 0 };
     const some_orthogonal = try functools.someSlice(Point2D, &slice, orthogonal, .{e_x});
 
     try testing.expect(some_orthogonal);
@@ -182,24 +212,12 @@ test "test some on Point2D slice" {
 
 test "test every on Point2D slice" {
     const slice = [_]Point2D{
-        .{
-            .x = 0,
-            .y = 1,
-        },
-        .{
-            .x = 0,
-            .y = 3,
-        },
+        .{ .x = 0, .y = 1 },
+        .{ .x = 0, .y = 3 },
         // This one is not orthogonal to (1, 0)
-        .{
-            .x = 1,
-            .y = 4,
-        },
+        .{ .x = 1, .y = 4 },
     };
-    const e_x = Point2D{
-        .x = 1,
-        .y = 0,
-    };
+    const e_x = Point2D{ .x = 1, .y = 0 };
     const every_orthogonal = try functools.everySlice(Point2D, &slice, orthogonal, .{e_x});
 
     try testing.expect(!every_orthogonal);
