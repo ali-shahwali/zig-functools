@@ -2,7 +2,7 @@
 
 A Zig library that provides functional programming tools such as map, reduce and filter.
 
-### Add it to your project
+## Add it to your project
 
 Add the `.functools` dependency to your `build.zig.zon`.
 
@@ -13,7 +13,7 @@ Add the `.functools` dependency to your `build.zig.zon`.
     .dependencies = .{
         .functools = .{
             .url = "https://github.com/ali-shahwali/zig-functools/archive/refs/tags/v0.0.2.tar.gz",
-            .hash = "1220cb19ad8386016ced2928287df8757a8831d3fd42981c8e60662bbc8e818da9fa",
+            .hash = "1220301a11b35299c1dd7c6806e1a1f7d2a485eecfa3aa3999ecaba990b06d13f534",
         },
     },
 }
@@ -37,9 +37,11 @@ The library can now be imported as a module.
 const functools = @import("functools");
 ```
 
-### Examples
+## Documentation
+The documentation can be found [here](https://ali-shahwali.github.io/zig-functools/).
 
-The [tests](./src/tests.zig) are good examples of how to use the library, below are some simple examples from the tests. <br> <br>
+## Examples
+The documentation contains some examples. The tests are also good examples of how to use the library, below are some simple examples from the tests. <br> <br>
 **Map over slice and increment each element.**
 
 ```zig
@@ -88,25 +90,12 @@ fn orthogonal(p1: Point2D, p2: Point2D) bool {
 }
 
 test "test every on Point2D slice" {
-    const slice = [3]Point2D{
-        .{
-            .x = 0,
-            .y = 1,
-        },
-        .{
-            .x = 0,
-            .y = 3,
-        },
-        // This one is not orthogonal to (1, 0)
-        .{
-            .x = 1,
-            .y = 4,
-        },
+    const slice = [_]Point2D{
+        .{ .x = 0, .y = 1 },
+        .{ .x = 0, .y = 3 },
+        .{ .x = 1, .y = 4 }, // This one is not orthogonal to (1, 0)
     };
-    const e_x = Point2D{
-        .x = 1,
-        .y = 0,
-    };
+    const e_x = Point2D{ .x = 1, .y = 0 };
     const every_orthogonal = try functools.everySlice(Point2D, &slice, orthogonal, .{e_x});
 
     try testing.expect(!every_orthogonal);
