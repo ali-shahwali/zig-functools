@@ -112,3 +112,19 @@ test "test every on Point2D slice" {
     try testing.expect(!every_orthogonal);
 }
 ```
+**Thread functions**
+```zig
+test "test threading map->filter->find" {
+    const allocator = testing.allocator;
+    const slice = functools.rangeSlice(i32, 10);
+
+    const nine = try functools.Thread(i32)
+        .init(allocator, slice)
+        .map(CommonMappers.inc(i32), .{})
+        .filter(CommonPredicates.odd(i32), .{})
+        .find(CommonPredicates.eq(i32), .{@as(i32, 9)});
+
+    try testing.expect(nine != null);
+    try testing.expect(nine.? == 9);
+}
+```
