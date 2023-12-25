@@ -12,8 +12,8 @@ Add the `.functools` dependency to your `build.zig.zon`.
     .version = "x.y.z",
     .dependencies = .{
         .functools = .{
-            .url = "https://github.com/ali-shahwali/zig-functools/archive/refs/tags/v0.0.1.tar.gz",
-            .hash = "12207e0d856ef9cd7f84926ddcd6e1603d75ed2c6f0ed24444ebe2856679629e9055",
+            .url = "https://github.com/ali-shahwali/zig-functools/archive/refs/tags/v0.0.2.tar.gz",
+            .hash = "1220cb19ad8386016ced2928287df8757a8831d3fd42981c8e60662bbc8e818da9fa",
         },
     },
 }
