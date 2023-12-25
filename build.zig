@@ -32,6 +32,12 @@ const benchmarks = [_]Benchmark{
         .description = "Benchmark the 2 different filter implementations",
         .path = "benchmarks/filter_impl.zig",
     },
+    .{
+        .name = "all",
+        .run_step_name = "bench-all",
+        .description = "Run all benchmarks",
+        .path = "benchmarks/all.zig",
+    },
 };
 
 pub fn build(b: *std.Build) !void {
@@ -56,20 +62,6 @@ pub fn build(b: *std.Build) !void {
     });
 
     b.installArtifact(lib);
-
-    const bench_all_step = b.step("bench-all", "Run all benchmarks");
-
-    var bench_all = b.addExecutable(.{
-        .name = "bench-all",
-        .root_source_file = .{ .path = "benchmarks/all.zig" },
-        .target = target,
-        .optimize = .ReleaseSafe,
-    });
-    bench_all.addModule("functools", functools);
-    bench_all.addModule("chameleon", cham);
-
-    const bench_all_run = b.addRunArtifact(bench_all);
-    bench_all_step.dependOn(&bench_all_run.step);
 
     inline for (benchmarks) |config| {
         const bench_run_step = b.step(config.run_step_name, config.description);

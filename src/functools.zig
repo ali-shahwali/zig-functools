@@ -17,6 +17,7 @@ pub const someSlice = functions.someSlice;
 pub const everySlice = functions.everySlice;
 pub const takeNth = functions.takeNth;
 pub const rangeSlice = functions.rangeSlice;
+pub const rangeAllocSlice = functions.rangeAllocSlice;
 pub const findSlice = functions.findSlice;
 
 pub const Thread = thread.Thread;

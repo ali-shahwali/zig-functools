@@ -35,7 +35,7 @@ fn filterSliceWithList(allocator: std.mem.Allocator, comptime T: type, slice: []
     return try filtered_list.toOwnedSlice();
 }
 
-fn withAllocFilter(allocator: std.mem.Allocator, data: []const i32) void {
+fn withAllocFilter(allocator: std.mem.Allocator, data: []i32) void {
     _ = filterSliceWithAlloc(
         allocator,
         i32,
@@ -45,7 +45,7 @@ fn withAllocFilter(allocator: std.mem.Allocator, data: []const i32) void {
     ) catch unreachable;
 }
 
-fn withListFilter(allocator: std.mem.Allocator, data: []const i32) void {
+fn withListFilter(allocator: std.mem.Allocator, data: []i32) void {
     _ = filterSliceWithList(
         allocator,
         i32,
@@ -60,7 +60,7 @@ pub fn benchmark(allocator: std.mem.Allocator) !void {
 
     print(cham.blue().bold().fmt("Benchmarking filter implementations with {d} elements.\n"), .{TEST_SIZE});
 
-    const data = try functools.rangeSlice(allocator, i32, TEST_SIZE);
+    const data = try functools.rangeAllocSlice(allocator, i32, TEST_SIZE);
 
     const filter_alloc_time = util.benchMilli(
         "With alloc filter",
