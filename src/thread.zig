@@ -67,7 +67,7 @@ pub fn Thread(comptime T: type) type {
             if (self.err) |err| {
                 return err;
             }
-            return functions.reduceSlice(T, T, slice, func, args, initial_value) catch |err| {
+            return functions.reduceSlice(T, slice, func, args, initial_value) catch |err| {
                 return err;
             };
         }

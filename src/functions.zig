@@ -49,20 +49,20 @@ pub fn mapMutSlice(comptime T: type, slice: []T, comptime func: anytype, args: a
 
 /// Reduce slice of type `T` to value of type `RT` using function `func`.
 /// Additionally supply some arguments to `func` and an initial value to reduce from.
-pub fn reduceSlice(comptime T: type, comptime RT: type, slice: []const T, comptime func: anytype, args: anytype, initial_value: RT) !RT {
+pub fn reduceSlice(comptime T: type, slice: []const T, comptime func: anytype, args: anytype, initial_value: @typeInfo(@TypeOf(func)).Fn.return_type.?) !@typeInfo(@TypeOf(func)).Fn.return_type.? {
+    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type orelse {
+        return FunctoolTypeError.InvalidReturnType;
+    };
     comptime {
-        if (@typeInfo(@TypeOf(func)).Fn.params[0].type.? != RT) {
+        if (@typeInfo(@TypeOf(func)).Fn.params[0].type.? != ReturnType) {
             return FunctoolTypeError.InvalidParamType;
         }
         if (@typeInfo(@TypeOf(func)).Fn.params[1].type.? != T) {
             return FunctoolTypeError.InvalidParamType;
         }
-        if (@typeInfo(@TypeOf(func)).Fn.return_type.? != RT) {
-            return FunctoolTypeError.InvalidReturnType;
-        }
     }
 
-    var accumulator: RT = initial_value;
+    var accumulator: ReturnType = initial_value;
 
     for (slice[0..]) |item| {
         accumulator = @call(.auto, func, .{ accumulator, item } ++ args);

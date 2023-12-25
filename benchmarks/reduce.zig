@@ -19,7 +19,6 @@ fn printResult(method: []const u8, t1: i64, t2: i64) void {
 fn withReduce(data: []const i64) i64 {
     return functools.reduceSlice(
         i64,
-        i64,
         data,
         functools.CommonReducers.sum(i64),
         .{},
