@@ -77,3 +77,5 @@ fn find(self: *const Self, comptime pred: anytype, args: anytype) !?T
 fn result(self: *const Self) ![]T
 
 ```
+
+[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig){target="_self"}

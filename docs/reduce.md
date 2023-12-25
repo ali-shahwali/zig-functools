@@ -54,3 +54,5 @@ test "test reduce struct field" {
 ```
 ## Why reduce?
 Similar to map, we are abstracting away a common programming pattern, that of looping and accumulating.
+
+[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/reduce.zig){target="_self"}

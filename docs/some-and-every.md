@@ -42,3 +42,6 @@ fn someSlice(comptime T: type, slice: []const T, comptime pred: anytype, args: a
 
 fn everySlice(comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) !bool
 ```
+[`some` Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/some.zig){target="_self"}
+
+[`every` Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/every.zig){target="_self"}

@@ -68,3 +68,5 @@ fn mapSlice(allocator: Allocator, comptime T: type, slice: []const T, comptime f
 
 fn mapMutSlice(comptime T: type, slice: []T, comptime func: anytype, args: anytype,) !void
 ```
+
+[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/map.zig){target="_self"}

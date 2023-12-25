@@ -48,3 +48,5 @@ The use case for filter is much more obvious than that of map and reduce, being 
 fn filterSlice(allocator: std.mem.Allocator, comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) ![]T
 
 ```
+
+[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/filter.zig){target="_self"}
