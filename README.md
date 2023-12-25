@@ -1,7 +1,11 @@
 # Zig Functools
+
 A Zig library that provides functional programming tools such as map, reduce and filter.
+
 ### Add it to your project
+
 Add the `.functools` dependency to your `build.zig.zon`.
+
 ```zig
 .{
     .name = "Your project name",
@@ -14,7 +18,9 @@ Add the `.functools` dependency to your `build.zig.zon`.
     },
 }
 ```
+
 Add this to your `build.zig` inside the `build` function.
+
 ```zig
 const functools = b.dependency("functools", .{
         .target = target,
@@ -24,27 +30,34 @@ exe.addModule("functools", functools.module("functools"));
 // Or, if you are building a library
 // lib.addModule("functools", functools.module("functools"));
 ```
+
 The library can now be imported as a module.
+
 ```zig
 const functools = @import("functools");
 ```
+
 ### Examples
+
 The [tests](./src/tests.zig) are good examples of how to use the library, below are some simple examples from the tests. <br> <br>
 **Map over slice and increment each element.**
+
 ```zig
 test "test map mutable slice on i32 slice without args" {
     var slice = [3]i32{ 1, 2, 3 };
     functools.mapMutSlice(
         i32,
         &slice,
-        CommonMappers.inc(i32),
+        functools.CommonMappers.inc(i32),
         .{},
     );
 
     try testing.expectEqualSlices(i32, &slice, &[_]i32{ 2, 3, 4 });
 }
 ```
+
 **Filter even integers.**
+
 ```zig
 test "test filter on i32 slice" {
     const slice = [_]i32{ 1, 2, 3, 4, 5 };
@@ -53,7 +66,7 @@ test "test filter on i32 slice" {
         allocator,
         i32,
         &slice,
-        CommonPredicates.even(i32),
+        functools.CommonPredicates.even(i32),
         .{},
     );
     defer allocator.free(even);
@@ -61,7 +74,9 @@ test "test filter on i32 slice" {
     try testing.expectEqualSlices(i32, even, &[_]i32{ 2, 4 });
 }
 ```
+
 **Check that every vector is orthogonal to the x basis vector.**
+
 ```zig
 const Point2D = struct {
     x: i32,

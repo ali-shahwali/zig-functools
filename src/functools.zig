@@ -176,3 +176,24 @@ pub fn rangeSlice(allocator: std.mem.Allocator, comptime T: type, comptime n: us
 
     return slice;
 }
+
+/// Find and retrieve first item that predicate `pred` evaluates to true in slice of type `T`.
+/// Additionally supply some arguments to `pred`.
+pub fn findSlice(comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) !?T {
+    comptime {
+        if (@typeInfo(@TypeOf(pred)).Fn.params[0].type.? != T) {
+            return FunctoolTypeError.InvalidParamType;
+        }
+        if (@typeInfo(@TypeOf(pred)).Fn.return_type.? != bool) {
+            return FunctoolTypeError.InvalidReturnType;
+        }
+    }
+
+    for (slice[0..]) |item| {
+        if (@call(.auto, pred, .{item} ++ args)) {
+            return item;
+        }
+    }
+
+    return null;
+}

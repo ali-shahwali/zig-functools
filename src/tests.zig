@@ -238,3 +238,39 @@ test "test range slice" {
 
     try testing.expectEqualSlices(i32, slice, &[_]i32{ 0, 1, 2, 3 });
 }
+
+test "test find slice" {
+    const slice = [_]Point2D{
+        .{
+            .x = 8,
+            .y = 1,
+        },
+        .{
+            .x = 4,
+            .y = 3,
+        },
+        .{
+            .x = 2,
+            .y = 4,
+        },
+    };
+
+    const found = try functools.findSlice(
+        Point2D,
+        &slice,
+        CommonPredicates.fieldEq(Point2D, i32),
+        .{ "x", 2 },
+    );
+
+    try testing.expect(found != null);
+    try testing.expectEqual(found.?, slice[2]);
+
+    const not_found = try functools.findSlice(
+        Point2D,
+        &slice,
+        CommonPredicates.fieldEq(Point2D, i32),
+        .{ "y", 5 },
+    );
+
+    try testing.expect(not_found == null);
+}

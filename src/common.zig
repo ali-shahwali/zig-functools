@@ -268,4 +268,13 @@ pub const CommonPredicates = struct {
             }
         }).apply;
     }
+
+    /// Evalatues `true` if field supplied in args of `item` equals that of value supplied in args.
+    pub fn fieldEq(comptime T: type, comptime FieldType: type) fn (item: T, comptime field: []const u8, value: FieldType) bool {
+        return (struct {
+            fn apply(item: T, comptime field: []const u8, value: FieldType) bool {
+                return @field(item, field) == value;
+            }
+        }).apply;
+    }
 };
