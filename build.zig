@@ -1,13 +1,13 @@
 const std = @import("std");
 
-const Benchmark = struct {
+const Runnable = struct {
     name: []const u8,
     run_step_name: []const u8,
     description: []const u8,
     path: []const u8,
 };
 
-const benchmarks = [_]Benchmark{
+const benchmarks = [_]Runnable{
     .{
         .name = "map",
         .run_step_name = "bench-map",
@@ -80,11 +80,10 @@ pub fn build(b: *std.Build) !void {
     }
 
     const tests = b.addTest(.{
-        .root_source_file = .{ .path = "src/tests.zig" },
+        .root_source_file = .{ .path = "src/functools.zig" },
         .target = target,
         .optimize = optimize,
     });
-    tests.addModule("functools", functools);
     const run_tests = b.addRunArtifact(tests);
     const test_step = b.step("test", "Run library tests");
     test_step.dependOn(&run_tests.step);

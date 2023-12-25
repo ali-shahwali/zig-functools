@@ -1,4 +1,4 @@
-const std = @import("std");
+//! This module contains a set of common mapping, reducing and predicate functions.
 
 /// Set of common mapping functions.
 pub const CommonMappers = struct {

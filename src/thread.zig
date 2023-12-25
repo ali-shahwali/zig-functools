@@ -1,6 +1,8 @@
 const std = @import("std");
 const functions = @import("functions.zig");
 const Allocator = std.mem.Allocator;
+const testing = std.testing;
+const common = @import("common.zig");
 
 pub fn Thread(comptime T: type) type {
     return struct {
@@ -110,4 +112,76 @@ pub fn Thread(comptime T: type) type {
             }
         }
     };
+}
+
+const CommonMappers = common.CommonMappers;
+const CommonPredicates = common.CommonPredicates;
+const CommonReducers = common.CommonReducers;
+
+test "test threading map->filter->reduce" {
+    const allocator = testing.allocator;
+    const slice = functions.rangeSlice(i32, 10);
+
+    const result = try Thread(i32)
+        .init(allocator, slice)
+        .map(CommonMappers.inc(i32), .{})
+        .filter(CommonPredicates.even(i32), .{})
+        .reduce(CommonReducers.sum(i32), .{}, 0);
+
+    try testing.expectEqual(result, 30);
+}
+
+test "test threading map->filter" {
+    const allocator = testing.allocator;
+    const slice = functions.rangeSlice(i32, 10);
+
+    const result = try Thread(i32)
+        .init(allocator, slice)
+        .map(CommonMappers.inc(i32), .{})
+        .filter(CommonPredicates.even(i32), .{})
+        .result();
+
+    defer allocator.free(result);
+
+    try testing.expectEqualSlices(i32, &[_]i32{ 2, 4, 6, 8, 10 }, result);
+}
+
+test "test threading map->filter->some" {
+    const allocator = testing.allocator;
+    const slice = functions.rangeSlice(i32, 10);
+
+    const some_even = try Thread(i32)
+        .init(allocator, slice)
+        .map(CommonMappers.inc(i32), .{})
+        .filter(CommonPredicates.odd(i32), .{})
+        .some(CommonPredicates.even(i32), .{});
+
+    try testing.expect(!some_even);
+}
+
+test "test threading map->filter->every" {
+    const allocator = testing.allocator;
+    const slice = functions.rangeSlice(i32, 10);
+
+    const every_odd = try Thread(i32)
+        .init(allocator, slice)
+        .map(CommonMappers.inc(i32), .{})
+        .filter(CommonPredicates.odd(i32), .{})
+        .every(CommonPredicates.odd(i32), .{});
+
+    try testing.expect(every_odd);
+}
+
+test "test threading map->filter->find" {
+    const allocator = testing.allocator;
+    const slice = functions.rangeSlice(i32, 10);
+
+    const nine = try Thread(i32)
+        .init(allocator, slice)
+        .map(CommonMappers.inc(i32), .{})
+        .filter(CommonPredicates.odd(i32), .{})
+        .find(CommonPredicates.eq(i32), .{@as(i32, 9)});
+
+    try testing.expect(nine != null);
+    try testing.expect(nine.? == 9);
 }

@@ -1,23 +1,5 @@
-const std = @import("std");
-const common = @import("common.zig");
-const functions = @import("functions.zig");
-const thread = @import("thread.zig");
-
-pub const FunctoolTypeError = functions.FunctoolTypeError;
-
-pub const CommonMappers = common.CommonMappers;
-pub const CommonReducers = common.CommonReducers;
-pub const CommonPredicates = common.CommonPredicates;
-
-pub const mapSlice = functions.mapSlice;
-pub const mapMutSlice = functions.mapMutSlice;
-pub const reduceSlice = functions.reduceSlice;
-pub const filterSlice = functions.filterSlice;
-pub const someSlice = functions.someSlice;
-pub const everySlice = functions.everySlice;
-pub const takeNth = functions.takeNth;
-pub const rangeSlice = functions.rangeSlice;
-pub const rangeAllocSlice = functions.rangeAllocSlice;
-pub const findSlice = functions.findSlice;
-
-pub const Thread = thread.Thread;
+//! The functools namespace.
+//! Includes all functions, common functions and the threading API.
+pub usingnamespace @import("common.zig");
+pub usingnamespace @import("functions.zig");
+pub usingnamespace @import("thread.zig");
