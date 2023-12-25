@@ -40,5 +40,11 @@ test "test filter on Point2D slice" {
     });
 }
 ```
-### Why filter?
+## Why filter?
 The use case for filter is much more obvious than that of map and reduce, being able to easily remove items from a sequence based on some condition is a powerful tool.
+
+## Declarations
+```zig
+fn filterSlice(allocator: std.mem.Allocator, comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) ![]T
+
+```

@@ -36,3 +36,9 @@ test "test every on Point2D slice" {
     try testing.expect(!every_orthogonal);
 }
 ```
+## Declarations
+```zig
+fn someSlice(comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) !bool
+
+fn everySlice(comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) !bool
+```

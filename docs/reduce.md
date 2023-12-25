@@ -52,5 +52,5 @@ test "test reduce struct field" {
     try testing.expectEqual(result, 9);
 }
 ```
-### Why reduce?
+## Why reduce?
 Similar to map, we are abstracting away a common programming pattern, that of looping and accumulating.

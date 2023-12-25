@@ -16,7 +16,7 @@ test "test map mutable slice on i32 slice without args" {
     try testing.expectEqualSlices(i32, &slice, &[_]i32{ 2, 3, 4 });
 }
 ```
-::: details
+::: details Note
 `functools.CommonMappers`, `functools.CommonReducers`, `functools.CommonPredicates` are collections of functions that come with the library, it contains many common functions that one uses when programming functionally.
 :::
 
@@ -59,5 +59,12 @@ test "test map i32 slice to Point2D slice" {
 ```
 
 
-### Why map?
+## Why map?
 A lot of code we write can simply be boiled down to looping over some sequence and manipulating the data at the current index. This essentially is the same thing as mapping, map is useful because it abstracts a common programming pattern that can be overly verbose.
+
+## Declarations
+```zig
+fn mapSlice(allocator: Allocator, comptime T: type, slice: []const T, comptime func: anytype, args: anytype) ![]@typeInfo(@TypeOf(func)).Fn.return_type.?
+
+fn mapMutSlice(comptime T: type, slice: []T, comptime func: anytype, args: anytype,) !void
+```

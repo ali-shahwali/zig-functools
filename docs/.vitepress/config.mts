@@ -25,7 +25,7 @@ export default defineConfig({
         ]
       }
     ],
-
+    aside: true,
     socialLinks: [
       { icon: 'github', link: 'https://github.com/ali-shahwali/zig-functools' }
     ]

@@ -1,5 +1,4 @@
 const std = @import("std");
-const common = @import("common.zig");
 const functions = @import("functions.zig");
 const Allocator = std.mem.Allocator;
 
