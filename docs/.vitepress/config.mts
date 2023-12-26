@@ -8,21 +8,28 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Getting Started', link: '/getting-started' }
+      { text: 'Getting Started', link: '/guide/getting-started' }
     ],
 
     sidebar: [
       {
         text: 'Guide',
         items: [
-          { text: 'Getting Started', link: '/getting-started' },
-          { text: 'Map', link: '/map' },
-          { text: 'Reduce', link: '/reduce' },
-          { text: 'Filter', link: '/filter' },
-          { text: 'Some and Every', link: '/some-and-every' },
-          { text: 'Threading', link: '/threading' },
-          { text: 'API', link: '/api' }
+          { text: 'Getting Started', link: '/guide/getting-started' },
+          { text: 'Map', link: '/guide/map' },
+          { text: 'Reduce', link: '/guide/reduce' },
+          { text: 'Filter', link: '/guide/filter' },
+          { text: 'Some and Every', link: '/guide/some-and-every' },
+          { text: 'Threading', link: '/guide/threading' },
         ]
+      },
+      {
+        text: "API",
+        items: [
+          { text: "Core", link: '/api/core' },
+          { text: "Thread", link: '/api/thread' },
+          { text: "Utilities", link: '/api/utilities' },
+        ],
       }
     ],
     aside: true,

@@ -1,6 +1,8 @@
 # Map
 Map is one of the more common and useful operations one frequently does. The basic idea is to perform some mapping of one value to another for each element in a sequence. We specify the mapping with a function.
 
+## Examples
+
 **Increment all integers in a slice**
 
 ```zig{3-8}
@@ -58,15 +60,6 @@ test "test map i32 slice to Point2D slice" {
 }
 ```
 
-
 ## Why map?
 A lot of code we write can simply be boiled down to looping over some sequence and manipulating the data at the current index. This essentially is the same thing as mapping, map is useful because it abstracts a common programming pattern that can be overly verbose.
 
-## Declarations
-```zig
-fn mapSlice(allocator: Allocator, comptime T: type, slice: []const T, comptime func: anytype, args: anytype) ![]@typeInfo(@TypeOf(func)).Fn.return_type.?
-
-fn mapMutSlice(comptime T: type, slice: []T, comptime func: anytype, args: anytype,) !void
-```
-
-[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/map.zig){target="_self"}

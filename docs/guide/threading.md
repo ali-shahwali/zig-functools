@@ -1,8 +1,11 @@
 # Threading
-When talking about threading in a functional programming context we are referring to the idea of chaining together multiple functional calls and piping in the result from the previous function in to the next. The functool library provides a way of doing this.
 ::: warning
 This is an unstable feature and the API is very likely to change over time.
 :::
+
+When talking about threading in a functional programming context we are referring to the idea of chaining together multiple functional calls and piping in the result from the previous function in to the next. The functool library provides a way of doing this.
+
+## Examples
 
 **Increment all numbers in a slice, then filter even ones**
 

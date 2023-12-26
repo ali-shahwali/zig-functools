@@ -1,6 +1,8 @@
 # Some and Every
 We can use the function `someSlice` to check that there exists _some_ element in a slice that satisfies a condition. Similarly we can use the function `everySlice` to check that _every_ element in a slice satisfies a condition.
 
+## Examples
+
 **Check that some Point2D is orthogonal to the x basis vector**
 ```zig
 fn orthogonal(p1: Point2D, p2: Point2D) bool {
@@ -36,12 +38,3 @@ test "test every on Point2D slice" {
     try testing.expect(!every_orthogonal);
 }
 ```
-## Declarations
-```zig
-fn someSlice(comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) !bool
-
-fn everySlice(comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) !bool
-```
-[`some` Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/some.zig){target="_self"}
-
-[`every` Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/every.zig){target="_self"}

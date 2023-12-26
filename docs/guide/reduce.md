@@ -1,6 +1,8 @@
 # Reduce
 Reduce is also a very common and useful operation. The idea behind reducing is to take a sequence and essentially boil it down (reduce it) to a single value.
 
+## Examples
+
 **Reduce slice of integers to the sum of all elements**
 
 ```zig
@@ -53,10 +55,3 @@ test "test reduce struct field" {
 ## Why reduce?
 Similar to map, we are abstracting away a common programming pattern, that of looping and accumulating.
 
-## Declarations
-```zig
-pub fn reduceSlice(comptime T: type, slice: []const T, comptime func: anytype, args: anytype, initial_value: @typeInfo(@TypeOf(func)).Fn.return_type.?) !@typeInfo(@TypeOf(func)).Fn.return_type.?
-
-```
-
-[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/reduce.zig){target="_self"}

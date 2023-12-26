@@ -1,6 +1,8 @@
 # Filter
 The idea behind filter is to remove some elements from a sequence based on some condition (predicate), a condition can for example be, _"is a number even?"_ or _"does the struct field contain this value?"_. 
 
+## Examples
+
 **Filter even numbers**
 ```zig
 test "test filter on i32 slice" {
@@ -42,11 +44,3 @@ test "test filter on Point2D slice" {
 ```
 ## Why filter?
 The use case for filter is much more obvious than that of map and reduce, being able to easily remove items from a sequence based on some condition is a powerful tool.
-
-## Declarations
-```zig
-fn filterSlice(allocator: std.mem.Allocator, comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) ![]T
-
-```
-
-[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/filter.zig){target="_self"}
