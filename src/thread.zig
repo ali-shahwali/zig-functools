@@ -1,5 +1,6 @@
 const std = @import("std");
-const functions = @import("functions.zig");
+const core = @import("core.zig");
+const util = @import("util.zig");
 const Allocator = std.mem.Allocator;
 const testing = std.testing;
 const common = @import("common.zig");
@@ -30,7 +31,7 @@ pub fn Thread(comptime T: type) type {
                     .allocator = self.allocator,
                 };
             }
-            functions.mapMutSlice(T, slice, func, args) catch |err| {
+            core.mapMutSlice(T, slice, func, args) catch |err| {
                 return .{
                     .err = err,
                     .allocator = self.allocator,
@@ -49,7 +50,7 @@ pub fn Thread(comptime T: type) type {
                     .allocator = self.allocator,
                 };
             }
-            const filtered = functions.filterSlice(self.allocator, T, slice, pred, args) catch |err| {
+            const filtered = core.filterSlice(self.allocator, T, slice, pred, args) catch |err| {
                 return .{
                     .err = err,
                     .allocator = self.allocator,
@@ -69,7 +70,7 @@ pub fn Thread(comptime T: type) type {
             if (self.err) |err| {
                 return err;
             }
-            return functions.reduceSlice(T, slice, func, args, initial_value) catch |err| {
+            return core.reduceSlice(T, slice, func, args, initial_value) catch |err| {
                 return err;
             };
         }
@@ -79,7 +80,7 @@ pub fn Thread(comptime T: type) type {
             if (self.err) |err| {
                 return err;
             }
-            return functions.someSlice(T, slice, pred, args) catch |err| {
+            return core.someSlice(T, slice, pred, args) catch |err| {
                 return err;
             };
         }
@@ -89,7 +90,7 @@ pub fn Thread(comptime T: type) type {
             if (self.err) |err| {
                 return err;
             }
-            return functions.everySlice(T, slice, pred, args) catch |err| {
+            return core.everySlice(T, slice, pred, args) catch |err| {
                 return err;
             };
         }
@@ -99,7 +100,7 @@ pub fn Thread(comptime T: type) type {
             if (self.err) |err| {
                 return err;
             }
-            return functions.findSlice(T, slice, pred, args) catch |err| {
+            return core.findSlice(T, slice, pred, args) catch |err| {
                 return err;
             };
         }
@@ -120,7 +121,7 @@ const CommonReducers = common.CommonReducers;
 
 test "test threading map->filter->reduce" {
     const allocator = testing.allocator;
-    const slice = functions.rangeSlice(i32, 10);
+    const slice = util.rangeSlice(i32, 10);
 
     const result = try Thread(i32)
         .init(allocator, slice)
@@ -133,7 +134,7 @@ test "test threading map->filter->reduce" {
 
 test "test threading map->filter" {
     const allocator = testing.allocator;
-    const slice = functions.rangeSlice(i32, 10);
+    const slice = util.rangeSlice(i32, 10);
 
     const result = try Thread(i32)
         .init(allocator, slice)
@@ -148,7 +149,7 @@ test "test threading map->filter" {
 
 test "test threading map->filter->some" {
     const allocator = testing.allocator;
-    const slice = functions.rangeSlice(i32, 10);
+    const slice = util.rangeSlice(i32, 10);
 
     const some_even = try Thread(i32)
         .init(allocator, slice)
@@ -161,7 +162,7 @@ test "test threading map->filter->some" {
 
 test "test threading map->filter->every" {
     const allocator = testing.allocator;
-    const slice = functions.rangeSlice(i32, 10);
+    const slice = util.rangeSlice(i32, 10);
 
     const every_odd = try Thread(i32)
         .init(allocator, slice)
@@ -174,7 +175,7 @@ test "test threading map->filter->every" {
 
 test "test threading map->filter->find" {
     const allocator = testing.allocator;
-    const slice = functions.rangeSlice(i32, 10);
+    const slice = util.rangeSlice(i32, 10);
 
     const nine = try Thread(i32)
         .init(allocator, slice)
