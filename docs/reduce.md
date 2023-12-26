@@ -7,8 +7,7 @@ Reduce is also a very common and useful operation. The idea behind reducing is t
 test "test reduce slice on i32 slice" {
     const slice = [_]i32{ 1, 2, 3 };
     const result = try functools.reduceSlice(
-        i32, // Slice type
-        i32, // Return type
+        i32,
         &slice,
         CommonReducers.sum(i32),
         .{},
@@ -42,7 +41,6 @@ test "test reduce struct field" {
     const slice = [_]Point2D{ .{ .x = 1, .y = 2 }, .{ .x = 2, .y = 3 }, .{ .x = 3, .y = 4 } };
     const result = try functools.reduceSlice(
         Point2D,
-        i32,
         &slice,
         sumPointY,
         .{},
@@ -54,5 +52,11 @@ test "test reduce struct field" {
 ```
 ## Why reduce?
 Similar to map, we are abstracting away a common programming pattern, that of looping and accumulating.
+
+## Declarations
+```zig
+pub fn reduceSlice(comptime T: type, slice: []const T, comptime func: anytype, args: anytype, initial_value: @typeInfo(@TypeOf(func)).Fn.return_type.?) !@typeInfo(@TypeOf(func)).Fn.return_type.?
+
+```
 
 [Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/reduce.zig){target="_self"}
