@@ -56,7 +56,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Compute `ln(n)` on each item in slice.
+    /// Compute the natural logarithm `ln(n)` on each item in slice.
     pub fn log(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
@@ -101,7 +101,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Compute the cosinus value of each item in slice.
+    /// Compute the tangent value of each item in slice.
     pub fn tan(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
