@@ -40,6 +40,15 @@ const benchmarks = [_]Runnable{
     },
 };
 
+const examples = [_]Runnable{
+    .{
+        .name = "OV",
+        .run_step_name = "example-OV",
+        .description = "Run the Orthogonal Vectors example",
+        .path = "examples/orthogonal_vectors.zig",
+    },
+};
+
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
 
@@ -74,6 +83,21 @@ pub fn build(b: *std.Build) !void {
         });
         bench.addModule("functools", functools);
         bench.addModule("chameleon", cham);
+
+        const bench_run = b.addRunArtifact(bench);
+        bench_run_step.dependOn(&bench_run.step);
+    }
+
+    inline for (examples) |config| {
+        const bench_run_step = b.step(config.run_step_name, config.description);
+
+        var bench = b.addExecutable(.{
+            .name = config.name,
+            .root_source_file = .{ .path = config.path },
+            .target = target,
+            .optimize = optimize,
+        });
+        bench.addModule("functools", functools);
 
         const bench_run = b.addRunArtifact(bench);
         bench_run_step.dependOn(&bench_run.step);
