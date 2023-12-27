@@ -11,8 +11,8 @@ pub fn takeNth(allocator: Allocator, comptime T: type, slice: []const T, n: usiz
         @memcpy(copy, slice);
         return copy;
     }
-
-    var nth = try allocator.alloc(T, @divFloor(slice.len, n));
+    const len = try std.math.divCeil(usize, slice.len, n);
+    var nth = try allocator.alloc(T, len);
     var j: usize = 0;
     var i: usize = 0;
     while (i < slice.len) : (i += n) {

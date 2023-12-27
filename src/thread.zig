@@ -121,7 +121,8 @@ const CommonReducers = common.CommonReducers;
 
 test "test threading map->filter->reduce" {
     const allocator = testing.allocator;
-    const slice = util.rangeSlice(i32, 10);
+    const slice = try util.rangeSlice(allocator, i32, 10);
+    defer allocator.free(slice);
 
     const result = try Thread(i32)
         .init(allocator, slice)
@@ -134,7 +135,8 @@ test "test threading map->filter->reduce" {
 
 test "test threading map->filter" {
     const allocator = testing.allocator;
-    const slice = util.rangeSlice(i32, 10);
+    const slice = try util.rangeSlice(allocator, i32, 10);
+    defer allocator.free(slice);
 
     const result = try Thread(i32)
         .init(allocator, slice)
@@ -149,7 +151,8 @@ test "test threading map->filter" {
 
 test "test threading map->filter->some" {
     const allocator = testing.allocator;
-    const slice = util.rangeSlice(i32, 10);
+    const slice = try util.rangeSlice(allocator, i32, 10);
+    defer allocator.free(slice);
 
     const some_even = try Thread(i32)
         .init(allocator, slice)
@@ -162,7 +165,8 @@ test "test threading map->filter->some" {
 
 test "test threading map->filter->every" {
     const allocator = testing.allocator;
-    const slice = util.rangeSlice(i32, 10);
+    const slice = try util.rangeSlice(allocator, i32, 10);
+    defer allocator.free(slice);
 
     const every_odd = try Thread(i32)
         .init(allocator, slice)
@@ -175,7 +179,8 @@ test "test threading map->filter->every" {
 
 test "test threading map->filter->find" {
     const allocator = testing.allocator;
-    const slice = util.rangeSlice(i32, 10);
+    const slice = try util.rangeSlice(allocator, i32, 10);
+    defer allocator.free(slice);
 
     const nine = try Thread(i32)
         .init(allocator, slice)

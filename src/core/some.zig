@@ -2,10 +2,10 @@ const std = @import("std");
 const FunctoolTypeError = @import("errors.zig").FunctoolTypeError;
 const testing = std.testing;
 const common = @import("../common.zig");
+const rangeArrayList = @import("../util.zig").rangeArrayList;
 
-const CommonMappers = common.CommonMappers;
-const CommonReducers = common.CommonReducers;
-const CommonPredicates = common.CommonPredicates;
+const Allocator = std.mem.Allocator;
+const ArrayList = std.ArrayList;
 
 /// Returns true if `slice` contains an item of type `T` that passes the predicate specified by `pred`.
 /// Additionally supply some arguments to `pred`.
@@ -27,6 +27,29 @@ pub fn someSlice(comptime T: type, slice: []const T, comptime pred: anytype, arg
 
     return false;
 }
+
+/// Returns true if array list contains an item of type `T` that passes the predicate specified by `pred`.
+/// Additionally supply some arguments to `pred`.
+pub fn someArrayList(comptime T: type, arr: ArrayList(T), comptime pred: anytype, args: anytype) !bool {
+    comptime {
+        if (@typeInfo(@TypeOf(pred)).Fn.params[0].type.? != T) {
+            return FunctoolTypeError.InvalidParamType;
+        }
+        if (@typeInfo(@TypeOf(pred)).Fn.return_type.? != bool) {
+            return FunctoolTypeError.InvalidReturnType;
+        }
+    }
+
+    for (arr.items) |item| {
+        if (@call(.auto, pred, .{item} ++ args)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+const CommonPredicates = common.CommonPredicates;
 
 const Point2D = struct {
     x: i32,
@@ -58,6 +81,37 @@ test "test some on Point2D slice" {
 
     const e_x = Point2D{ .x = 1, .y = 0 };
     const some_orthogonal = try someSlice(Point2D, &slice, orthogonal, .{e_x});
+
+    try testing.expect(some_orthogonal);
+}
+
+test "test some array list" {
+    const allocator = testing.allocator;
+
+    const arr = try rangeArrayList(allocator, i32, 4);
+    defer arr.deinit();
+
+    const found = try someArrayList(
+        i32,
+        arr,
+        CommonPredicates.even(i32),
+        .{},
+    );
+
+    try testing.expect(found);
+}
+
+test "test every on Point2D array list" {
+    const allocator = testing.allocator;
+    var arr = ArrayList(Point2D).init(allocator);
+    defer arr.deinit();
+
+    try arr.append(.{ .x = 5, .y = 2 });
+    try arr.append(.{ .x = 1, .y = 3 });
+    try arr.append(.{ .x = 0, .y = 4 });
+
+    const e_x = Point2D{ .x = 1, .y = 0 };
+    const some_orthogonal = try someArrayList(Point2D, arr, orthogonal, .{e_x});
 
     try testing.expect(some_orthogonal);
 }

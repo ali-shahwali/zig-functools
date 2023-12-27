@@ -60,7 +60,7 @@ pub fn benchmark(allocator: std.mem.Allocator) !void {
 
     print(cham.blue().bold().fmt("Benchmarking filter implementations with {d} elements.\n"), .{TEST_SIZE});
 
-    const data = try functools.rangeAllocSlice(allocator, i32, TEST_SIZE);
+    const data = try functools.rangeSlice(allocator, i32, TEST_SIZE);
 
     const filter_alloc_time = util.benchMilli(
         "With alloc filter",
