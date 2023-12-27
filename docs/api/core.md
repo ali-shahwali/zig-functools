@@ -27,18 +27,53 @@
 
 - **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/map.zig#L32){target="_self"}**
 
+## mapArrayList
+- **Type**
+
+    ```zig
+    fn mapArrayList(comptime T: type, arr: ArrayList(T), comptime func: anytype, args: anytype) !void
+    ```
+- **Documentation**
+
+    Map over array list of type `T` using function `func` on each element of `slice`. Additionally supply some arguments to `func`.
+
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/core/map.zig#L46){target="_self"}**
+
+## mapAllocArrayList
+- **Type**
+
+    ```zig
+    fn mapAllocArrayList(allocator: Allocator, comptime T: type, arr: ArrayList(T), comptime func: anytype, args: anytype) !ArrayList(@typeInfo(@TypeOf(func)).Fn.return_type.?)
+    ```
+- **Documentation**
+
+    Map over array list of type `T` using function `func` on each element of `arr`, returns a new allocated array list with mapped elements. Additionally supply some arguments to `func`.
+
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/core/map.zig#L61){target="_self"}**
 
 ## reduceSlice
 - **Type**
 
     ```zig
-    pub fn reduceSlice(comptime T: type, slice: []const T, comptime func: anytype, args: anytype, initial_value: @typeInfo(@TypeOf(func)).Fn.return_type.?) !@typeInfo(@TypeOf(func)).Fn.return_type.?
+    fn reduceSlice(comptime T: type, slice: []const T, comptime func: anytype, args: anytype, initial_value: @typeInfo(@TypeOf(func)).Fn.return_type.?) !@typeInfo(@TypeOf(func)).Fn.return_type.?
     ```
 - **Documentation**
 
     Reduce slice of type `T` using function `func` with initial value to reduce from. Additionally supply some arguments to `func`.
 
-- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/reduce.zig#L10){target="_self"}**
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/reduce.zig#L11){target="_self"}**
+
+## reduceArrayList
+- **Type**
+
+    ```zig
+    fn reduceArrayList(comptime T: type, arr: ArrayList(T), comptime func: anytype, args: anytype, initial_value: @typeInfo(@TypeOf(func)).Fn.return_type.?) !@typeInfo(@TypeOf(func)).Fn.return_type.?
+    ```
+- **Documentation**
+
+    Reduce array list of type `T` using function `func`. Additionally supply some arguments to `func` and an initial value to reduce from.
+
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/reduce.zig#L35){target="_self"}**
 
 
 ## filterSlice
@@ -51,7 +86,19 @@
 
     Create new slice filtered from `slice` of type `T` using function `pred` as predicate. Additionally supply some arguments to `pred`. Consumer must make sure to free returned slice.
 
-- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/filter.zig#L14){target="_self"}**
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/filter.zig#L13){target="_self"}**
+
+## filterArrayList
+- **Type**
+
+    ```zig
+    fn filterArrayList(allocator: Allocator, comptime T: type, arr: ArrayList(T), comptime pred: anytype, args: anytype) !ArrayList(T)
+    ```
+- **Documentation**
+
+    Create new array list filtered from `arr` of type `T` using function `pred` as predicate. Additionally supply some arguments to `pred`. Consumer must make sure to free returned array list.
+
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/filter.zig#L39){target="_self"}**
 
 ## someSlice
 - **Type**
@@ -65,6 +112,18 @@
 
 - **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/some.zig#L12){target="_self"}**
 
+## someArrayList
+- **Type**
+
+    ```zig
+    fn someArrayList(comptime T: type, arr: ArrayList(T), comptime pred: anytype, args: anytype) !bool
+    ```
+- **Documentation**
+
+    Returns true if array list contains an item of type `T` that passes the predicate specified by `pred` Additionally supply some arguments to `pred`.
+
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/some.zig#L32){target="_self"}**
+
 
 ## everySlice
 - **Type**
@@ -76,7 +135,19 @@
 
     Returns true if predicate defined by `pred` is true for every element in `slice` of type `T`. Additionally supply some arguments to `pred`.
 
-- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/every.zig#L10){target="_self"}**
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/every.zig#L12){target="_self"}**
+
+## everyArrayList
+- **Type**
+
+    ```zig
+    fn everyArrayList(comptime T: type, arr: ArrayList(T), comptime pred: anytype, args: anytype) !bool
+    ```
+- **Documentation**
+
+    Returns true if predicate defined by `pred` is true for every item in array list of type `T`. Additionally supply some arguments to `pred`.
+
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/every.zig#L33){target="_self"}**
 
 ## findSlice
 - **Type**
@@ -88,4 +159,16 @@
 
     Find and retrieve first item that predicate `pred` evaluates to `true` in slice of type `T`. Additionally supply some arguments to `pred`.
 
-- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/find.zig#L14){target="_self"}**
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/find.zig#L12){target="_self"}**
+
+## findArrayList
+- **Type**
+
+    ```zig
+    fn findArrayList(comptime T: type, arr: ArrayList(T), comptime pred: anytype, args: anytype) !?T
+    ```
+- **Documentation**
+
+    Find and retrieve first item that predicate `pred` evaluates to true in array list of type `T`. Additionally supply some arguments to `pred`.
+
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/functions/find.zig#L33){target="_self"}**

@@ -1,6 +1,6 @@
 .{
     .name = "functools",
-    .version = "0.0.2",
+    .version = "0.0.3",
     .dependencies = .{
         .chameleon = .{
             .url = "https://github.com/tr1ckydev/chameleon/archive/3d7fdd61598edecacd2c53c5ecff76a79abb8661.tar.gz",

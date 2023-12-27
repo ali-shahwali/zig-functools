@@ -59,26 +59,3 @@ test "test threading map->filter->some" {
     try testing.expect(!some_even);
 }
 ```
-## Declarations
-```zig
-fn Thread(comptime T: type) type
-
-fn init(allocator: Allocator, data: []T) Self
-
-fn map(self: *const Self, comptime func: anytype, args: anytype) Self
-
-fn filter(self: *const Self, comptime pred: anytype, args: anytype) Self
-
-fn reduce(self: *const Self, comptime func: anytype, args: anytype, initial_value: T) !T
-
-fn some(self: *const Self, comptime pred: anytype, args: anytype) !bool
-
-fn every(self: *const Self, comptime pred: anytype, args: anytype) !bool
-
-fn find(self: *const Self, comptime pred: anytype, args: anytype) !?T
-
-fn result(self: *const Self) ![]T
-
-```
-
-[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig){target="_self"}

@@ -42,8 +42,9 @@ pub fn rangeSlice(allocator: Allocator, comptime T: type, n: usize) ![]T {
 /// Returns an `ArrayList(T)` of length `n` where the elements start from 0 and go to n - 1.
 /// ```zig
 /// // Example
-/// const slice = functools.rangeSlice(i32, 4);
-/// try testing.expectEqualSlices(i32, slice, &[_]i32{ 0, 1, 2, 3 });
+/// const allocator = testing.allocator;
+/// const arr = functools.rangeArrayList(allocator, i32, 4);
+/// try testing.expectEqualSlices(i32, arr.items, &[_]i32{ 0, 1, 2, 3 });
 /// ```
 pub fn rangeArrayList(allocator: Allocator, comptime T: type, n: usize) !ArrayList(T) {
     var list = try ArrayList(T).initCapacity(allocator, n);
