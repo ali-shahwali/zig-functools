@@ -7,15 +7,6 @@ const Chameleon = @import("chameleon").Chameleon;
 
 const TEST_SIZE = 90000000;
 
-fn printResult(method: []const u8, t1: i64, t2: i64) void {
-    const overhead: f64 = @as(f64, @floatFromInt(t1)) / @as(f64, @floatFromInt(t2));
-    if (overhead < 1) {
-        print("{s} incurs a {d:.2}% speedup.\n", .{ method, (1 - overhead) * 100 });
-    } else {
-        print("{s} incurs a {d:.2}% overhead.\n", .{ method, (overhead - 1) * 100 });
-    }
-}
-
 fn withReduce(data: []const i64) i64 {
     return functools.reduceSlice(
         i64,
