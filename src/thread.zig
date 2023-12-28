@@ -1,26 +1,31 @@
 const std = @import("std");
 const core = @import("core.zig");
 const util = @import("util.zig");
+const common = @import("common.zig");
+
 const Allocator = std.mem.Allocator;
 const testing = std.testing;
-const common = @import("common.zig");
 
 pub fn Thread(comptime T: type) type {
     return struct {
+        slice: []T,
         err: ?error{ FunctoolTypeError, OutOfMemory } = null,
         allocator: Allocator,
 
         const Self = @This();
 
-        var slice: []T = undefined;
-
         pub fn init(allocator: Allocator, data: []T) Self {
-            slice = allocator.alloc(T, data.len) catch |err| {
-                return .{ .allocator = allocator, .err = err };
+            const slice = allocator.alloc(T, data.len) catch |err| {
+                return .{
+                    .err = err,
+                    .slice = undefined,
+                    .allocator = allocator,
+                };
             };
             @memcpy(slice, data);
             return .{
                 .allocator = allocator,
+                .slice = slice,
             };
         }
 
@@ -29,78 +34,85 @@ pub fn Thread(comptime T: type) type {
                 return .{
                     .err = err,
                     .allocator = self.allocator,
+                    .slice = self.slice,
                 };
             }
-            core.mapMutSlice(T, slice, func, args) catch |err| {
+            core.mapMutSlice(T, self.slice, func, args) catch |err| {
                 return .{
                     .err = err,
                     .allocator = self.allocator,
+                    .slice = self.slice,
                 };
             };
 
             return .{
                 .allocator = self.allocator,
+                .slice = self.slice,
             };
         }
 
         pub fn filter(self: *const Self, comptime pred: anytype, args: anytype) Self {
             if (self.err) |err| {
                 return .{
+                    .slice = self.slice,
                     .err = err,
                     .allocator = self.allocator,
                 };
             }
-            const filtered = core.filterSlice(self.allocator, T, slice, pred, args) catch |err| {
+            const filtered = core.filterSlice(self.allocator, T, self.slice, pred, args) catch |err| {
                 return .{
+                    .slice = self.slice,
                     .err = err,
                     .allocator = self.allocator,
                 };
             };
+
             defer self.allocator.free(filtered);
-            _ = self.allocator.resize(slice, filtered.len);
-            @memcpy(slice[0..filtered.len], filtered);
-            slice = slice[0..filtered.len];
+            _ = self.allocator.resize(self.slice, filtered.len);
+            @memcpy(self.slice[0..filtered.len], filtered);
+
             return .{
+                .slice = self.slice[0..filtered.len],
                 .allocator = self.allocator,
             };
         }
 
         pub fn reduce(self: *const Self, comptime func: anytype, args: anytype, initial_value: T) !T {
-            defer self.allocator.free(slice);
+            defer self.allocator.free(self.slice);
             if (self.err) |err| {
                 return err;
             }
-            return core.reduceSlice(T, slice, func, args, initial_value) catch |err| {
+            return core.reduceSlice(T, self.slice, func, args, initial_value) catch |err| {
                 return err;
             };
         }
 
         pub fn some(self: *const Self, comptime pred: anytype, args: anytype) !bool {
-            defer self.allocator.free(slice);
+            defer self.allocator.free(self.slice);
             if (self.err) |err| {
                 return err;
             }
-            return core.someSlice(T, slice, pred, args) catch |err| {
+            return core.someSlice(T, self.slice, pred, args) catch |err| {
                 return err;
             };
         }
 
         pub fn every(self: *const Self, comptime pred: anytype, args: anytype) !bool {
-            defer self.allocator.free(slice);
+            defer self.allocator.free(self.slice);
             if (self.err) |err| {
                 return err;
             }
-            return core.everySlice(T, slice, pred, args) catch |err| {
+            return core.everySlice(T, self.slice, pred, args) catch |err| {
                 return err;
             };
         }
 
         pub fn find(self: *const Self, comptime pred: anytype, args: anytype) !?T {
-            defer self.allocator.free(slice);
+            defer self.allocator.free(self.slice);
             if (self.err) |err| {
                 return err;
             }
-            return core.findSlice(T, slice, pred, args) catch |err| {
+            return core.findSlice(T, self.slice, pred, args) catch |err| {
                 return err;
             };
         }
@@ -109,7 +121,7 @@ pub fn Thread(comptime T: type) type {
             if (self.err) |err| {
                 return err;
             } else {
-                return slice;
+                return self.slice;
             }
         }
     };
