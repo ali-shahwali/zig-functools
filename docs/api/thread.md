@@ -9,7 +9,7 @@
 - **Documentation**
 
 
-- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L8){target="_self"}**
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L9){target="_self"}**
 
 ## init
 - **Type**
@@ -31,7 +31,7 @@
 - **Documentation**
 
 
-- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L27){target="_self"}**
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L32){target="_self"}**
 
 ## filter
 - **Type**
@@ -42,7 +42,7 @@
 - **Documentation**
 
 
-- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L46){target="_self"}**
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L54){target="_self"}**
 
 ## reduce
 - **Type**
@@ -53,7 +53,7 @@
 - **Documentation**
 
 
-- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L68){target="_self"}**
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L80){target="_self"}**
 
 ## some
 - **Type**
@@ -64,7 +64,7 @@
 - **Documentation**
 
 
-- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L78){target="_self"}**
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L90){target="_self"}**
 
 ## every
 - **Type**
@@ -75,7 +75,7 @@
 - **Documentation**
 
 
-- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L88){target="_self"}**
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L100){target="_self"}**
 
 ## find
 - **Type**
@@ -86,7 +86,7 @@
 - **Documentation**
 
 
-- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L98){target="_self"}**
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L110){target="_self"}**
 
 ## result
 - **Type**
@@ -97,4 +97,4 @@
 - **Documentation**
 
 
-- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L108){target="_self"}**
+- **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/thread.zig#L120){target="_self"}**
