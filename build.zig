@@ -47,6 +47,12 @@ const examples = [_]Runnable{
         .description = "Run the Orthogonal Vectors example",
         .path = "examples/orthogonal_vectors.zig",
     },
+    .{
+        .name = "set",
+        .run_step_name = "example-set",
+        .description = "Run the set example",
+        .path = "examples/set.zig",
+    },
 };
 
 pub fn build(b: *std.Build) !void {

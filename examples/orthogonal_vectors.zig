@@ -16,11 +16,14 @@ const TEST_SIZE = 100;
 const SEED = 1827319;
 var prng = std.rand.DefaultPrng.init(SEED);
 
-const Vec3 = struct { x: i64, y: i64, z: i64 };
-
-fn isOrthogonal(v1: Vec3, v2: Vec3) bool {
-    return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z) == 0;
-}
+const Vec3 = struct {
+    x: i64,
+    y: i64,
+    z: i64,
+    pub fn orthogonal(v1: Vec3, v2: Vec3) bool {
+        return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z) == 0;
+    }
+};
 
 fn randVec3(v: Vec3) Vec3 {
     _ = v;
@@ -44,7 +47,7 @@ pub fn main() !void {
     try functools.mapMutSlice(Vec3, set_A, randVec3, .{});
     try functools.mapMutSlice(Vec3, set_B, randVec3, .{});
     for (set_A[0..]) |v| {
-        const found = try functools.findSlice(Vec3, set_B, isOrthogonal, .{v});
+        const found = try functools.findSlice(Vec3, set_B, Vec3.orthogonal, .{v});
 
         if (found) |ov| {
             print("Found 2 orthogonal vectors\n", .{});
