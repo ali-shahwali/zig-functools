@@ -12,11 +12,11 @@ When talking about threading in a functional programming context we are referrin
 ```zig
 test "test threading map->filter" {
     const allocator = testing.allocator;
+    // slice = {0, 1, 2, ..., 9}
+    const slice = try util.rangeSlice(allocator, i32, 10);
+    defer allocator.free(slice);
 
-    // slice = []i32{0, 1, 2, ..., 9}
-    const slice = functools.rangeSlice(i32, 10);
-
-    const result = try functools.Thread(i32)
+    const result = try Thread(i32)
         .init(allocator, slice)
         .map(CommonMappers.inc(i32), .{})
         .filter(CommonPredicates.even(i32), .{})
@@ -32,9 +32,10 @@ test "test threading map->filter" {
 ```zig
 test "test threading map->filter->reduce" {
     const allocator = testing.allocator;
-    const slice = functools.rangeSlice(i32, 10);
+    const slice = try util.rangeSlice(allocator, i32, 10);
+    defer allocator.free(slice);
 
-    const result = try functools.Thread(i32)
+    const result = try Thread(i32)
         .init(allocator, slice)
         .map(CommonMappers.inc(i32), .{})
         .filter(CommonPredicates.even(i32), .{})
@@ -48,9 +49,10 @@ test "test threading map->filter->reduce" {
 ```zig
 test "test threading map->filter->some" {
     const allocator = testing.allocator;
-    const slice = functools.rangeSlice(i32, 10);
+    const slice = try util.rangeSlice(allocator, i32, 10);
+    defer allocator.free(slice);
 
-    const some_even = try functools.Thread(i32)
+    const some_even = try Thread(i32)
         .init(allocator, slice)
         .map(CommonMappers.inc(i32), .{})
         .filter(CommonPredicates.odd(i32), .{})
