@@ -10,14 +10,14 @@ const CommonPredicates = functools.CommonPredicates;
 pub fn Set(comptime T: type) type {
     return struct {
         allocator: Allocator,
-        set: std.ArrayList(T),
+        set: functools.Sequence(T),
 
         const Self = @This();
 
         pub fn init(allocator: Allocator) Self {
             return .{
                 .allocator = allocator,
-                .set = std.ArrayList(T).init(allocator),
+                .set = functools.Sequence(T).init(allocator),
             };
         }
 
@@ -25,55 +25,31 @@ pub fn Set(comptime T: type) type {
             self.set.deinit();
         }
 
-        pub fn fromArrayList(allocator: Allocator, arr: std.ArrayList(T)) !Self {
-            var set = std.ArrayList(T).init(allocator);
-            for (arr.items) |item| {
-                const some = try functools.someArrayList(
-                    T,
-                    set,
-                    CommonPredicates.eq(T),
-                    .{item},
-                );
+        pub fn fromSlice(allocator: Allocator, slice: []T) !Self {
+            var seq = functools.Sequence(i32).init(allocator);
+            for (slice[0..]) |item| {
+                const some = try seq.some(CommonPredicates.eq(T), .{item});
+
                 if (!some) {
-                    try set.append(item);
+                    try seq.append(item);
                 }
             }
-            return .{ .allocator = allocator, .set = set };
-        }
-
-        pub fn asArrayList(self: *const Self) !std.ArrayList(T) {
-            return try self.set.clone();
+            return .{ .allocator = allocator, .set = seq };
         }
 
         pub fn insert(self: *Self, item: T) !void {
-            const some = try functools.someArrayList(
-                T,
-                self.set,
-                CommonPredicates.eq(T),
-                .{item},
-            );
+            const some = try self.set.some(CommonPredicates.eq(T), .{item});
             if (!some) {
                 try self.set.append(item);
             }
         }
 
         pub fn remove(self: *Self, item: T) !void {
-            self.set = try functools.filterArrayList(
-                self.allocator,
-                T,
-                self.set,
-                functools.CommonPredicates.neq(T),
-                .{item},
-            );
+            try self.set.filter(functools.CommonPredicates.neq(T), .{item});
         }
 
         pub fn contains(self: *const Self, item: T) !bool {
-            return try functools.someArrayList(
-                T,
-                self.set,
-                CommonPredicates.eq(T),
-                .{item},
-            );
+            return try self.set.some(CommonPredicates.eq(T), .{item});
         }
 
         pub fn size(self: *const Self) usize {
@@ -83,7 +59,7 @@ pub fn Set(comptime T: type) type {
         pub fn setIntersect(allocator: Allocator, s1: Set(T), s2: Set(T)) !Set(T) {
             var intersected = Set(T).init(allocator);
 
-            for (s1.set.items) |item| {
+            for (s1.set.seq.items) |item| {
                 const c = try s2.contains(item);
                 if (c) {
                     try intersected.insert(item);
@@ -94,9 +70,9 @@ pub fn Set(comptime T: type) type {
         }
 
         pub fn setUnion(allocator: Allocator, s1: Set(T), s2: Set(T)) !Set(T) {
-            var result = try Set(T).fromArrayList(allocator, s1.set);
+            var result = try Set(T).fromSlice(allocator, s1.set.seq.items);
 
-            for (s2.set.items) |item| {
+            for (s2.set.seq.items) |item| {
                 try result.insert(item);
             }
 
@@ -104,9 +80,9 @@ pub fn Set(comptime T: type) type {
         }
 
         pub fn setDifference(allocator: Allocator, s1: Set(T), s2: Set(T)) !Set(T) {
-            var result = try Set(T).fromArrayList(allocator, s1.set);
+            var result = try Set(T).fromSlice(allocator, s1.set.seq.items);
 
-            for (s2.set.items) |item| {
+            for (s2.set.seq.items) |item| {
                 try result.remove(item);
             }
 
@@ -114,7 +90,7 @@ pub fn Set(comptime T: type) type {
         }
 
         pub fn pprint(self: *const Self) void {
-            std.debug.print("{any}\n", .{self.set.items});
+            std.debug.print("{any}\n", .{self.set.seq.items});
         }
     };
 }

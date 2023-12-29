@@ -1,3 +1,5 @@
+//! This module contains the Thread API
+
 const std = @import("std");
 const core = @import("core.zig");
 const util = @import("util.zig");
@@ -6,6 +8,7 @@ const common = @import("common.zig");
 const Allocator = std.mem.Allocator;
 const testing = std.testing;
 
+/// A data structure used for chaining multiple functional calls.
 pub fn Thread(comptime T: type) type {
     return struct {
         slice: []T,
@@ -14,6 +17,7 @@ pub fn Thread(comptime T: type) type {
 
         const Self = @This();
 
+        /// Initialize thread
         pub fn init(allocator: Allocator, data: []T) Self {
             const slice = allocator.alloc(T, data.len) catch |err| {
                 return .{
@@ -29,6 +33,11 @@ pub fn Thread(comptime T: type) type {
             };
         }
 
+        pub fn deinit(self: *const Self) void {
+            self.allocator.free(self.slice);
+        }
+
+        /// Perform mapping, returns Thread with mapping peformed.
         pub fn map(self: *const Self, comptime func: anytype, args: anytype) Self {
             if (self.err) |err| {
                 return .{
@@ -51,6 +60,7 @@ pub fn Thread(comptime T: type) type {
             };
         }
 
+        /// Perform filtering, returns Thread with filtering peformed.
         pub fn filter(self: *const Self, comptime pred: anytype, args: anytype) Self {
             if (self.err) |err| {
                 return .{
@@ -77,8 +87,9 @@ pub fn Thread(comptime T: type) type {
             };
         }
 
+        /// Perform reduce, returns result from reducing and deinits thread making it unusable.
         pub fn reduce(self: *const Self, comptime func: anytype, args: anytype, initial_value: T) !T {
-            defer self.allocator.free(self.slice);
+            defer self.deinit();
             if (self.err) |err| {
                 return err;
             }
@@ -87,8 +98,9 @@ pub fn Thread(comptime T: type) type {
             };
         }
 
+        /// Perform some, returns result from some and deinits thread making it unusable.
         pub fn some(self: *const Self, comptime pred: anytype, args: anytype) !bool {
-            defer self.allocator.free(self.slice);
+            defer self.deinit();
             if (self.err) |err| {
                 return err;
             }
@@ -97,8 +109,9 @@ pub fn Thread(comptime T: type) type {
             };
         }
 
+        /// Perform every, returns result from every and deinits thread making it unusable.
         pub fn every(self: *const Self, comptime pred: anytype, args: anytype) !bool {
-            defer self.allocator.free(self.slice);
+            defer self.deinit();
             if (self.err) |err| {
                 return err;
             }
@@ -107,8 +120,9 @@ pub fn Thread(comptime T: type) type {
             };
         }
 
+        /// Perform find, returns result from find and deinits thread making it unusable.
         pub fn find(self: *const Self, comptime pred: anytype, args: anytype) !?T {
-            defer self.allocator.free(self.slice);
+            defer self.deinit();
             if (self.err) |err| {
                 return err;
             }
@@ -117,6 +131,7 @@ pub fn Thread(comptime T: type) type {
             };
         }
 
+        /// Returns current result, user of function must make sure to free returned slice.
         pub fn result(self: *const Self) ![]T {
             if (self.err) |err| {
                 return err;

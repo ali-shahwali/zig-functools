@@ -21,6 +21,7 @@ export default defineConfig({
           { text: 'Filter', link: '/guide/filter' },
           { text: 'Some and Every', link: '/guide/some-and-every' },
           { text: 'Threading', link: '/guide/threading' },
+          { text: 'Sequence', link: '/guide/sequence' }
         ]
       },
       {
