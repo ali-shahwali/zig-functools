@@ -96,7 +96,7 @@ test "test every on Point2D slice" {
         .{ .x = 1, .y = 4 }, // This one is not orthogonal to (1, 0)
     };
     const e_x = Point2D{ .x = 1, .y = 0 };
-    const every_orthogonal = try functools.everySlice(Point2D, &slice, orthogonal, .{e_x});
+    const every_orthogonal = functools.everySlice(Point2D, &slice, orthogonal, .{e_x});
 
     try testing.expect(!every_orthogonal);
 }
