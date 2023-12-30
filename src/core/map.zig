@@ -1,5 +1,4 @@
 const std = @import("std");
-const FunctoolTypeError = @import("errors.zig").FunctoolTypeError;
 const testing = std.testing;
 const common = @import("../common.zig");
 const range = @import("../util/range.zig");
@@ -11,14 +10,7 @@ const ArrayList = std.ArrayList;
 /// Additionally supply some arguments to `func`.
 /// Consumer of function must make sure to free returned slice.
 pub fn mapSlice(allocator: Allocator, comptime T: type, slice: []const T, comptime func: anytype, args: anytype) ![]@typeInfo(@TypeOf(func)).Fn.return_type.? {
-    if (@typeInfo(@TypeOf(func)).Fn.params[0].type.? != T) {
-        return FunctoolTypeError.InvalidParamType;
-    }
-
-    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type orelse {
-        return FunctoolTypeError.InvalidReturnType;
-    };
-
+    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type.?;
     var mapped_slice = try allocator.alloc(ReturnType, slice.len);
     for (0..slice.len) |idx| {
         mapped_slice[idx] = @call(.auto, func, .{slice[idx]} ++ args);
@@ -29,13 +21,7 @@ pub fn mapSlice(allocator: Allocator, comptime T: type, slice: []const T, compti
 
 /// Map over mutable slice of type `T` using function `func` on each element of `slice`.
 /// Additionally supply some arguments to `func`,
-pub fn mapMutSlice(comptime T: type, slice: []T, comptime func: anytype, args: anytype) !void {
-    comptime {
-        if (@typeInfo(@TypeOf(func)).Fn.params[0].type.? != T) {
-            return FunctoolTypeError.InvalidParamType;
-        }
-    }
-
+pub fn mapMutSlice(comptime T: type, slice: []T, comptime func: anytype, args: anytype) void {
     for (0..slice.len) |idx| {
         slice[idx] = @call(.auto, func, .{slice[idx]} ++ args);
     }
@@ -43,13 +29,7 @@ pub fn mapMutSlice(comptime T: type, slice: []T, comptime func: anytype, args: a
 
 /// Map over array list of type `T` using function `func` on each element of `slice`.
 /// Additionally supply some arguments to `func`,
-pub fn mapArrayList(comptime T: type, arr: ArrayList(T), comptime func: anytype, args: anytype) !void {
-    comptime {
-        if (@typeInfo(@TypeOf(func)).Fn.params[0].type.? != T) {
-            return FunctoolTypeError.InvalidParamType;
-        }
-    }
-
+pub fn mapArrayList(comptime T: type, arr: ArrayList(T), comptime func: anytype, args: anytype) void {
     for (0..arr.items.len) |idx| {
         arr.items[idx] = @call(.auto, func, .{arr.items[idx]} ++ args);
     }
@@ -59,14 +39,7 @@ pub fn mapArrayList(comptime T: type, arr: ArrayList(T), comptime func: anytype,
 /// returns a new allocated array list with mapped elements.
 /// Additionally supply some arguments to `func`,
 pub fn mapAllocArrayList(allocator: Allocator, comptime T: type, arr: ArrayList(T), comptime func: anytype, args: anytype) !ArrayList(@typeInfo(@TypeOf(func)).Fn.return_type.?) {
-    comptime {
-        if (@typeInfo(@TypeOf(func)).Fn.params[0].type.? != T) {
-            return FunctoolTypeError.InvalidParamType;
-        }
-    }
-    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type orelse {
-        return FunctoolTypeError.InvalidReturnType;
-    };
+    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type.?;
 
     var mapped_list = try ArrayList(ReturnType).initCapacity(allocator, arr.capacity);
     for (0..arr.items.len) |idx| {
@@ -103,7 +76,7 @@ test "test map mutable slice on i32 slice without args" {
     var slice = try range.rangeSlice(allocator, i32, 3);
     defer allocator.free(slice);
 
-    try mapMutSlice(
+    mapMutSlice(
         i32,
         slice,
         CommonMappers.inc(i32),
@@ -192,7 +165,7 @@ test "test map i32 array list" {
     var arr = try range.rangeArrayList(allocator, i32, 4);
     defer arr.deinit();
 
-    try mapArrayList(i32, arr, CommonMappers.inc(i32), .{});
+    mapArrayList(i32, arr, CommonMappers.inc(i32), .{});
     try testing.expectEqualSlices(i32, arr.items, &[_]i32{ 1, 2, 3, 4 });
 }
 

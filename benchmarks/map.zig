@@ -17,7 +17,7 @@ fn withMapMutSlice(data: []i32) void {
         data,
         functools.CommonMappers.inc(i32),
         .{},
-    ) catch unreachable;
+    );
 }
 
 fn withoutMap(data: []i32) void {

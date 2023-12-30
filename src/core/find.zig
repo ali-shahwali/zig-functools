@@ -1,5 +1,4 @@
 const std = @import("std");
-const FunctoolTypeError = @import("errors.zig").FunctoolTypeError;
 const testing = std.testing;
 const common = @import("../common.zig");
 const rangeArrayList = @import("../util.zig").rangeArrayList;
@@ -9,16 +8,7 @@ const ArrayList = std.ArrayList;
 
 /// Find and retrieve first item that predicate `pred` evaluates to true in slice of type `T`.
 /// Additionally supply some arguments to `pred`.
-pub fn findSlice(comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) !?T {
-    comptime {
-        if (@typeInfo(@TypeOf(pred)).Fn.params[0].type.? != T) {
-            return FunctoolTypeError.InvalidParamType;
-        }
-        if (@typeInfo(@TypeOf(pred)).Fn.return_type.? != bool) {
-            return FunctoolTypeError.InvalidReturnType;
-        }
-    }
-
+pub fn findSlice(comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) ?T {
     for (slice[0..]) |item| {
         if (@call(.auto, pred, .{item} ++ args)) {
             return item;
@@ -30,16 +20,7 @@ pub fn findSlice(comptime T: type, slice: []const T, comptime pred: anytype, arg
 
 /// Find and retrieve first item that predicate `pred` evaluates to true in array list of type `T`.
 /// Additionally supply some arguments to `pred`.
-pub fn findArrayList(comptime T: type, arr: ArrayList(T), comptime pred: anytype, args: anytype) !?T {
-    comptime {
-        if (@typeInfo(@TypeOf(pred)).Fn.params[0].type.? != T) {
-            return FunctoolTypeError.InvalidParamType;
-        }
-        if (@typeInfo(@TypeOf(pred)).Fn.return_type.? != bool) {
-            return FunctoolTypeError.InvalidReturnType;
-        }
-    }
-
+pub fn findArrayList(comptime T: type, arr: ArrayList(T), comptime pred: anytype, args: anytype) ?T {
     for (arr.items) |item| {
         if (@call(.auto, pred, .{item} ++ args)) {
             return item;
@@ -63,7 +44,7 @@ test "test find slice" {
         .{ .x = 2, .y = 4 },
     };
 
-    const found = try findSlice(
+    const found = findSlice(
         Point2D,
         &slice,
         CommonPredicates.fieldEq(Point2D, i32),
@@ -73,7 +54,7 @@ test "test find slice" {
     try testing.expect(found != null);
     try testing.expectEqual(found.?, slice[2]);
 
-    const not_found = try findSlice(
+    const not_found = findSlice(
         Point2D,
         &slice,
         CommonPredicates.fieldEq(Point2D, i32),
@@ -89,7 +70,7 @@ test "test find array list" {
     const arr = try rangeArrayList(allocator, i32, 4);
     defer arr.deinit();
 
-    const found = try findArrayList(
+    const found = findArrayList(
         i32,
         arr,
         CommonPredicates.eq(i32),
@@ -99,7 +80,7 @@ test "test find array list" {
     try testing.expect(found != null);
     try testing.expectEqual(found.?, arr.items[2]);
 
-    const not_found = try findArrayList(
+    const not_found = findArrayList(
         i32,
         arr,
         CommonPredicates.eq(i32),

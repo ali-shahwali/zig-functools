@@ -14,7 +14,7 @@ fn withReduce(data: []const i64) i64 {
         functools.CommonReducers.sum(i64),
         .{},
         0,
-    ) catch unreachable;
+    );
 }
 
 fn withoutReduce(data: []const i64) i64 {

@@ -28,7 +28,7 @@ pub fn Set(comptime T: type) type {
         pub fn fromSlice(allocator: Allocator, slice: []T) !Self {
             var seq = functools.Sequence(i32).init(allocator);
             for (slice[0..]) |item| {
-                const some = try seq.some(CommonPredicates.eq(T), .{item});
+                const some = seq.some(CommonPredicates.eq(T), .{item});
 
                 if (!some) {
                     try seq.append(item);
@@ -38,7 +38,7 @@ pub fn Set(comptime T: type) type {
         }
 
         pub fn insert(self: *Self, item: T) !void {
-            const some = try self.set.some(CommonPredicates.eq(T), .{item});
+            const some = self.set.some(CommonPredicates.eq(T), .{item});
             if (!some) {
                 try self.set.append(item);
             }
@@ -48,8 +48,8 @@ pub fn Set(comptime T: type) type {
             try self.set.filter(functools.CommonPredicates.neq(T), .{item});
         }
 
-        pub fn contains(self: *const Self, item: T) !bool {
-            return try self.set.some(CommonPredicates.eq(T), .{item});
+        pub fn contains(self: *const Self, item: T) bool {
+            return self.set.some(CommonPredicates.eq(T), .{item});
         }
 
         pub fn size(self: *const Self) usize {

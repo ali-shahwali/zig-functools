@@ -6,4 +6,3 @@ pub usingnamespace @import("core/filter.zig");
 pub usingnamespace @import("core/some.zig");
 pub usingnamespace @import("core/every.zig");
 pub usingnamespace @import("core/find.zig");
-pub usingnamespace @import("core/errors.zig");

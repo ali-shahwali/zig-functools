@@ -1,5 +1,4 @@
 const std = @import("std");
-const FunctoolTypeError = @import("errors.zig").FunctoolTypeError;
 const testing = std.testing;
 const common = @import("../common.zig");
 const rangeArrayList = @import("../util.zig").rangeArrayList;
@@ -11,15 +10,6 @@ const ArrayList = std.ArrayList;
 /// Additionally supply some arguments to `pred`.
 /// Consumer must make sure to free returned slice.
 pub fn filterSlice(allocator: Allocator, comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) ![]T {
-    comptime {
-        if (@typeInfo(@TypeOf(pred)).Fn.params[0].type.? != T) {
-            return FunctoolTypeError.InvalidParamType;
-        }
-        if (@typeInfo(@TypeOf(pred)).Fn.return_type.? != bool) {
-            return FunctoolTypeError.InvalidReturnType;
-        }
-    }
-
     var filtered = try allocator.alloc(T, slice.len);
     var filtered_len: usize = 0;
     for (slice[0..]) |item| {
@@ -37,15 +27,6 @@ pub fn filterSlice(allocator: Allocator, comptime T: type, slice: []const T, com
 /// Additionally supply some arguments to `pred`.
 /// Consumer must make sure to free returned array list.
 pub fn filterArrayList(allocator: Allocator, comptime T: type, arr: ArrayList(T), comptime pred: anytype, args: anytype) !ArrayList(T) {
-    comptime {
-        if (@typeInfo(@TypeOf(pred)).Fn.params[0].type.? != T) {
-            return FunctoolTypeError.InvalidParamType;
-        }
-        if (@typeInfo(@TypeOf(pred)).Fn.return_type.? != bool) {
-            return FunctoolTypeError.InvalidReturnType;
-        }
-    }
-
     var filtered = try ArrayList(T).initCapacity(allocator, arr.capacity);
     for (arr.items) |item| {
         if (@call(.auto, pred, .{item} ++ args)) {

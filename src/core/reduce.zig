@@ -1,5 +1,4 @@
 const std = @import("std");
-const FunctoolTypeError = @import("errors.zig").FunctoolTypeError;
 const common = @import("../common.zig");
 const range = @import("../util/range.zig");
 const testing = std.testing;
@@ -8,18 +7,8 @@ const ArrayList = std.ArrayList;
 
 /// Reduce slice of type `T` using function `func`.
 /// Additionally supply some arguments to `func` and an initial value to reduce from.
-pub fn reduceSlice(comptime T: type, slice: []const T, comptime func: anytype, args: anytype, initial_value: @typeInfo(@TypeOf(func)).Fn.return_type.?) !@typeInfo(@TypeOf(func)).Fn.return_type.? {
-    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type orelse {
-        return FunctoolTypeError.InvalidReturnType;
-    };
-    comptime {
-        if (@typeInfo(@TypeOf(func)).Fn.params[0].type.? != ReturnType) {
-            return FunctoolTypeError.InvalidParamType;
-        }
-        if (@typeInfo(@TypeOf(func)).Fn.params[1].type.? != T) {
-            return FunctoolTypeError.InvalidParamType;
-        }
-    }
+pub fn reduceSlice(comptime T: type, slice: []const T, comptime func: anytype, args: anytype, initial_value: @typeInfo(@TypeOf(func)).Fn.return_type.?) @typeInfo(@TypeOf(func)).Fn.return_type.? {
+    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type.?;
 
     var accumulator: ReturnType = initial_value;
 
@@ -32,18 +21,8 @@ pub fn reduceSlice(comptime T: type, slice: []const T, comptime func: anytype, a
 
 /// Reduce array list of type `T` using function `func`.
 /// Additionally supply some arguments to `func` and an initial value to reduce from.
-pub fn reduceArrayList(comptime T: type, arr: ArrayList(T), comptime func: anytype, args: anytype, initial_value: @typeInfo(@TypeOf(func)).Fn.return_type.?) !@typeInfo(@TypeOf(func)).Fn.return_type.? {
-    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type orelse {
-        return FunctoolTypeError.InvalidReturnType;
-    };
-    comptime {
-        if (@typeInfo(@TypeOf(func)).Fn.params[0].type.? != ReturnType) {
-            return FunctoolTypeError.InvalidParamType;
-        }
-        if (@typeInfo(@TypeOf(func)).Fn.params[1].type.? != T) {
-            return FunctoolTypeError.InvalidParamType;
-        }
-    }
+pub fn reduceArrayList(comptime T: type, arr: ArrayList(T), comptime func: anytype, args: anytype, initial_value: @typeInfo(@TypeOf(func)).Fn.return_type.?) @typeInfo(@TypeOf(func)).Fn.return_type.? {
+    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type.?;
 
     var accumulator: ReturnType = initial_value;
 
@@ -67,7 +46,7 @@ fn sumPointY(prev: i32, curr: Point2D) i32 {
 
 test "test reduce slice on i32 slice" {
     const slice = [_]i32{ 1, 2, 3 };
-    const result = try reduceSlice(
+    const result = reduceSlice(
         i32,
         &slice,
         CommonReducers.sum(i32),
@@ -80,7 +59,7 @@ test "test reduce slice on i32 slice" {
 
 test "test reduce struct field" {
     const slice = [_]Point2D{ .{ .x = 1, .y = 2 }, .{ .x = 2, .y = 3 }, .{ .x = 3, .y = 4 } };
-    const result = try reduceSlice(
+    const result = reduceSlice(
         Point2D,
         &slice,
         sumPointY,
@@ -96,7 +75,7 @@ test "test reduce i32 array list" {
     const arr = try range.rangeArrayList(allocator, i32, 4);
     defer arr.deinit();
 
-    const result = try reduceArrayList(
+    const result = reduceArrayList(
         i32,
         arr,
         CommonReducers.sum(i32),

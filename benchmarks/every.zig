@@ -13,7 +13,7 @@ fn withEvery(data: []i64) bool {
         data,
         functools.CommonPredicates.eq(i64),
         .{@as(i64, 1)},
-    ) catch unreachable;
+    );
 }
 
 fn withoutEvery(data: []i64) bool {

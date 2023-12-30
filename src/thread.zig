@@ -46,13 +46,7 @@ pub fn Thread(comptime T: type) type {
                     .slice = self.slice,
                 };
             }
-            core.mapMutSlice(T, self.slice, func, args) catch |err| {
-                return .{
-                    .err = err,
-                    .allocator = self.allocator,
-                    .slice = self.slice,
-                };
-            };
+            core.mapMutSlice(T, self.slice, func, args);
 
             return .{
                 .allocator = self.allocator,
@@ -93,9 +87,7 @@ pub fn Thread(comptime T: type) type {
             if (self.err) |err| {
                 return err;
             }
-            return core.reduceSlice(T, self.slice, func, args, initial_value) catch |err| {
-                return err;
-            };
+            return core.reduceSlice(T, self.slice, func, args, initial_value);
         }
 
         /// Perform some, returns result from some and deinits thread making it unusable.
@@ -104,9 +96,7 @@ pub fn Thread(comptime T: type) type {
             if (self.err) |err| {
                 return err;
             }
-            return core.someSlice(T, self.slice, pred, args) catch |err| {
-                return err;
-            };
+            return core.someSlice(T, self.slice, pred, args);
         }
 
         /// Perform every, returns result from every and deinits thread making it unusable.
@@ -115,9 +105,7 @@ pub fn Thread(comptime T: type) type {
             if (self.err) |err| {
                 return err;
             }
-            return core.everySlice(T, self.slice, pred, args) catch |err| {
-                return err;
-            };
+            return core.everySlice(T, self.slice, pred, args);
         }
 
         /// Perform find, returns result from find and deinits thread making it unusable.
@@ -126,9 +114,7 @@ pub fn Thread(comptime T: type) type {
             if (self.err) |err| {
                 return err;
             }
-            return core.findSlice(T, self.slice, pred, args) catch |err| {
-                return err;
-            };
+            return core.findSlice(T, self.slice, pred, args);
         }
 
         /// Returns current result, user of function must make sure to free returned slice.
