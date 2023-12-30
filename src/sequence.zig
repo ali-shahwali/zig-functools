@@ -31,7 +31,7 @@ pub fn Sequence(comptime T: type) type {
         pub fn fromSlice(allocator: Allocator, slice: []T) !Self {
             var seq = try ArrayList(T).initCapacity(allocator, slice.len);
             for (slice[0..]) |v| {
-                try seq.append(v);
+                seq.appendAssumeCapacity(v);
             }
 
             return .{
@@ -123,7 +123,7 @@ pub fn Sequence(comptime T: type) type {
         pub fn conj(self: *Self, s: Sequence(T)) !void {
             try self.seq.ensureTotalCapacity(self.seq.capacity + s.seq.capacity);
             for (s.seq.items) |v| {
-                try self.seq.append(v);
+                self.seq.appendAssumeCapacity(v);
             }
         }
 
