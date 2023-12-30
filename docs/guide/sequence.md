@@ -1,7 +1,9 @@
 # Sequences
+
 A sequence is a an additional layer of abstraction on top of the well known `ArrayList` data structure implemented in `std`. Sequences make it easier for us to map, reduce, filter e.t.c. Below are some examples of how to use Sequences.
 
 **Filter Sequence**
+
 ```zig
 test "test filter sequence" {
     const allocator = testing.allocator;
@@ -19,6 +21,7 @@ test "test filter sequence" {
 ```
 
 **Conjoin and map Sequences**
+
 ```zig
 test "test map and conjoin sequence" {
     const allocator = testing.allocator;
@@ -32,7 +35,7 @@ test "test map and conjoin sequence" {
     var seq2 = try Sequence(i32).fromSlice(allocator, s2);
     defer seq2.deinit();
 
-    try seq2.map(CommonMappers.add(i32), .{5});
+    seq2.map(CommonMappers.add(i32), .{5});
 
     try seq1.conj(seq2);
     try seq1.filter(common.CommonPredicates.even(i32), .{});
@@ -45,6 +48,7 @@ test "test map and conjoin sequence" {
 ```
 
 **Thread functions on Sequence**
+
 ```zig
 test "test thread sequence" {
     const allocator = testing.allocator;
@@ -70,7 +74,7 @@ Because `Sequence` sits on top of the `ArrayList` implementation, you can easily
 ...
 /// Perform threading on sequence. Returns a new thread, user must make sure to
 /// free the result from threading if it is a slice. Threading does not deinit `self`.
-/// Note that any operations performed when threading do not modify the sequence. 
+/// Note that any operations performed when threading do not modify the sequence.
 pub fn thread(self: *const Self) Thread(T) {
     return Thread(T).init(self.allocator, self.seq.items);
 }
