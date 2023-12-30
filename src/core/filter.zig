@@ -28,13 +28,13 @@ pub fn filterSlice(allocator: Allocator, comptime T: type, slice: []const T, com
 /// Consumer must make sure to free returned array list.
 pub fn filterArrayList(allocator: Allocator, comptime T: type, arr: ArrayList(T), comptime pred: anytype, args: anytype) !ArrayList(T) {
     var filtered = try ArrayList(T).initCapacity(allocator, arr.capacity);
+
     for (arr.items) |item| {
         if (@call(.auto, pred, .{item} ++ args)) {
-            try filtered.append(item);
+            filtered.appendAssumeCapacity(item);
         }
     }
 
-    try filtered.resize(filtered.items.len);
     return filtered;
 }
 

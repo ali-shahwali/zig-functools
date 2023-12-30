@@ -43,7 +43,7 @@ pub fn mapAllocArrayList(allocator: Allocator, comptime T: type, arr: ArrayList(
 
     var mapped_list = try ArrayList(ReturnType).initCapacity(allocator, arr.capacity);
     for (0..arr.items.len) |idx| {
-        try mapped_list.append(@call(.auto, func, .{arr.items[idx]} ++ args));
+        mapped_list.appendAssumeCapacity(@call(.auto, func, .{arr.items[idx]} ++ args));
     }
 
     return mapped_list;
