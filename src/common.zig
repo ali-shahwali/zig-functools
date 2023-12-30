@@ -2,7 +2,7 @@
 
 /// Set of common mapping functions.
 pub const CommonMappers = struct {
-    /// Increment each number in slice.
+    /// Increment each number.
     pub fn inc(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
@@ -11,7 +11,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Decrement each number in slice.
+    /// Decrement each number.
     pub fn dec(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
@@ -20,7 +20,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Add `n` to each item in slice. Supply `n` with the args.
+    /// Add `n` to each item. Supply `n` with the args.
     pub fn add(comptime T: type) fn (item: T, n: T) T {
         return (struct {
             fn apply(item: T, n: T) T {
@@ -29,7 +29,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Subtract `n` to each item in slice. Supply `n` with the args.
+    /// Subtract `n` to each item. Supply `n` with the args.
     pub fn sub(comptime T: type) fn (item: T, n: T) T {
         return (struct {
             fn apply(item: T, n: T) T {
@@ -38,7 +38,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Multiply `n` to each item in slice. Supply `n` with the args.
+    /// Multiply `n` to each item. Supply `n` with the args.
     pub fn mul(comptime T: type) fn (item: T, n: T) T {
         return (struct {
             fn apply(item: T, n: T) T {
@@ -47,7 +47,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Divide `n` to each item in slice. Supply `n` with the args.
+    /// Divide `n` to each item. Supply `n` with the args.
     pub fn div(comptime T: type) fn (item: T, n: T) T {
         return (struct {
             fn apply(item: T, n: T) T {
@@ -56,7 +56,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Compute the natural logarithm `ln(n)` on each item in slice.
+    /// Compute the natural logarithm `ln(n)` on each item.
     pub fn log(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
@@ -65,7 +65,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Compute log base 2 on each item in slice.
+    /// Compute log base 2 on each item.
     pub fn log2(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
@@ -74,7 +74,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Compute log base 10 on each item in slice.
+    /// Compute log base 10 on each item .
     pub fn log10(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
@@ -83,7 +83,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Compute the sinus value of each item in slice.
+    /// Compute the sinus value of each item.
     pub fn sin(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
@@ -92,7 +92,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Compute the cosinus value of each item in slice.
+    /// Compute the cosinus value of each item.
     pub fn cos(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
@@ -101,7 +101,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Compute the tangent value of each item in slice.
+    /// Compute the tangent value of each item.
     pub fn tan(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
@@ -110,7 +110,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Compute the square root of each item in slice.
+    /// Compute the square root of each item.
     pub fn sqrt(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
@@ -119,7 +119,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Compute largest integral value not greater than given floating point number on each item in slice.
+    /// Compute largest integral value not greater than given floating point number on each item.
     pub fn floor(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
@@ -128,7 +128,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Compute smallest integral value not less than given floating point number on each item in slice.
+    /// Compute smallest integral value not less than given floating point number on each item.
     pub fn ceil(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
@@ -137,7 +137,7 @@ pub const CommonMappers = struct {
         }).apply;
     }
 
-    /// Round each floating point item in slice to an integer, towards zero.
+    /// Round each floating point item  to an integer, towards zero.
     pub fn trunc(comptime T: type) fn (item: T) T {
         return (struct {
             fn apply(item: T) T {
@@ -158,7 +158,7 @@ pub const CommonMappers = struct {
 
 /// Set of common reducers.
 pub const CommonReducers = struct {
-    /// Sum all numbers in slice.
+    /// Sum all numbers.
     pub fn sum(comptime T: type) fn (prev: T, curr: T) T {
         return (struct {
             fn apply(prev: T, curr: T) T {
@@ -167,7 +167,7 @@ pub const CommonReducers = struct {
         }).apply;
     }
 
-    /// Compute the product of all numbers in slice.
+    /// Compute the product of all numbers.
     pub fn prod(comptime T: type) fn (prev: T, curr: T) T {
         return (struct {
             fn apply(prev: T, curr: T) T {
