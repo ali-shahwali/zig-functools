@@ -122,9 +122,7 @@ pub fn Sequence(comptime T: type) type {
         /// Conjoin sequence with another sequence
         pub fn conj(self: *Self, s: Sequence(T)) !void {
             try self.seq.ensureTotalCapacity(self.seq.capacity + s.seq.capacity);
-            for (s.seq.items) |v| {
-                self.seq.appendAssumeCapacity(v);
-            }
+            self.seq.appendSliceAssumeCapacity(s.seq.items);
         }
 
         /// Append item to end of sequence
