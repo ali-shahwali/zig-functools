@@ -20,7 +20,8 @@ pub fn filterSlice(allocator: Allocator, comptime T: type, slice: []const T, com
     }
 
     _ = allocator.resize(filtered, filtered_len);
-    return filtered[0..filtered_len];
+    filtered.len = filtered_len;
+    return filtered;
 }
 
 /// Create new array list filtered from `arr` of type `T` using function `pred` as predicate.
