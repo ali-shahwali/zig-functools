@@ -2,7 +2,7 @@ const std = @import("std");
 const map = @import("map.zig");
 const reduce = @import("reduce.zig");
 const filter_impl = @import("filter_impl.zig");
-const every = @import("every.zig");
+const map_impl = @import("map_impl.zig");
 const functools = @import("functools");
 
 const BenchError = error{
@@ -16,7 +16,7 @@ const BENCHMARK_FNS = [_]BenchFn{
     map.benchmark,
     reduce.benchmark,
     filter_impl.benchmark,
-    every.benchmark,
+    map_impl.benchmark,
 };
 
 pub fn main() !void {

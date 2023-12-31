@@ -20,15 +20,16 @@ fn filterSliceWithAlloc(allocator: std.mem.Allocator, comptime T: type, slice: [
     }
 
     _ = allocator.resize(filtered, filtered_len);
-    return filtered[0..filtered_len];
+    filtered.len = filtered_len;
+    return filtered;
 }
 
 fn filterSliceWithList(allocator: std.mem.Allocator, comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) ![]T {
     var filtered_list = try std.ArrayList(T).initCapacity(allocator, slice.len);
 
-    for (slice[0..]) |item| {
+    for (slice) |item| {
         if (@call(.auto, pred, .{item} ++ args)) {
-            try filtered_list.append(item);
+            filtered_list.appendAssumeCapacity(item);
         }
     }
 
@@ -61,6 +62,7 @@ pub fn benchmark(allocator: std.mem.Allocator) !void {
     print(cham.blue().bold().fmt("Benchmarking filter implementations with {d} elements.\n"), .{TEST_SIZE});
 
     const data = try functools.rangeSlice(allocator, i32, TEST_SIZE);
+    defer allocator.free(data);
 
     const filter_alloc_time = util.benchMilli(
         "With alloc filter",

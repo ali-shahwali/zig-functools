@@ -21,16 +21,16 @@ const benchmarks = [_]Runnable{
         .path = "benchmarks/reduce.zig",
     },
     .{
-        .name = "every",
-        .run_step_name = "bench-every",
-        .description = "Benchmark the every function",
-        .path = "benchmarks/every.zig",
-    },
-    .{
         .name = "filter-impl",
         .run_step_name = "bench-filter-impl",
         .description = "Benchmark the 2 different filter implementations",
         .path = "benchmarks/filter_impl.zig",
+    },
+    .{
+        .name = "map-impl",
+        .run_step_name = "bench-map-impl",
+        .description = "Benchmark the 2 different map implementations",
+        .path = "benchmarks/map_impl.zig",
     },
     .{
         .name = "all",

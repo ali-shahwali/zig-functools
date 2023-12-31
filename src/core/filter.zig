@@ -10,18 +10,15 @@ const ArrayList = std.ArrayList;
 /// Additionally supply some arguments to `pred`.
 /// Consumer must make sure to free returned slice.
 pub fn filterSlice(allocator: Allocator, comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) ![]T {
-    var filtered = try allocator.alloc(T, slice.len);
-    var filtered_len: usize = 0;
+    var filtered_list = try std.ArrayList(T).initCapacity(allocator, slice.len);
+
     for (slice[0..]) |item| {
         if (@call(.auto, pred, .{item} ++ args)) {
-            filtered[filtered_len] = item;
-            filtered_len += 1;
+            filtered_list.appendAssumeCapacity(item);
         }
     }
 
-    _ = allocator.resize(filtered, filtered_len);
-    filtered.len = filtered_len;
-    return filtered;
+    return try filtered_list.toOwnedSlice();
 }
 
 /// Create new array list filtered from `arr` of type `T` using function `pred` as predicate.

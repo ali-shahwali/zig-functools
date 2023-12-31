@@ -5,7 +5,7 @@ const print = std.debug.print;
 const util = @import("util.zig");
 const Chameleon = @import("chameleon").Chameleon;
 
-const TEST_SIZE = 90000000;
+const TEST_SIZE = 900000000;
 
 fn withReduce(data: []const i64) i64 {
     return functools.reduceSlice(
@@ -32,6 +32,7 @@ pub fn benchmark(allocator: std.mem.Allocator) !void {
     print(cham.blue().bold().fmt("Benchmarking reduceSlice with {d} elements.\n"), .{TEST_SIZE});
 
     const data = try allocator.alloc(i64, TEST_SIZE);
+    defer allocator.free(data);
 
     @memset(data, 1);
 

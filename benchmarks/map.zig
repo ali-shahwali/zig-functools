@@ -32,6 +32,7 @@ pub fn benchmark(allocator: std.mem.Allocator) !void {
     print(cham.blue().bold().fmt("Benchmarking mapMutSlice with {d} elements.\n"), .{TEST_SIZE});
 
     const data = try allocator.alloc(i32, TEST_SIZE);
+    defer allocator.free(data);
 
     @memset(data, 0);
 
