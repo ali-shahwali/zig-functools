@@ -2,13 +2,14 @@ const std = @import("std");
 const testing = std.testing;
 const common = @import("../common.zig");
 const rangeArrayList = @import("../util.zig").rangeArrayList;
+const type_util = @import("type_util.zig");
 
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
 
 /// Returns true if `slice` contains an item of type `T` that passes the predicate specified by `pred`.
 /// Additionally supply some arguments to `pred`.
-pub fn someSlice(comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) bool {
+pub fn someSlice(comptime pred: anytype, slice: []const type_util.funcParamType(pred, 0), args: anytype) bool {
     for (slice[0..]) |item| {
         if (@call(.auto, pred, .{item} ++ args)) {
             return true;
@@ -20,7 +21,7 @@ pub fn someSlice(comptime T: type, slice: []const T, comptime pred: anytype, arg
 
 /// Returns true if array list contains an item of type `T` that passes the predicate specified by `pred`.
 /// Additionally supply some arguments to `pred`.
-pub fn someArrayList(comptime T: type, arr: ArrayList(T), comptime pred: anytype, args: anytype) bool {
+pub fn someArrayList(comptime pred: anytype, arr: ArrayList(type_util.funcParamType(pred, 0)), args: anytype) bool {
     for (arr.items) |item| {
         if (@call(.auto, pred, .{item} ++ args)) {
             return true;
@@ -40,9 +41,8 @@ const Point2D = struct {
 test "test some on i32 slice" {
     const slice = [_]i32{ 1, 3, 5 };
     const some_even = someSlice(
-        i32,
-        &slice,
         CommonPredicates.even(i32),
+        &slice,
         .{},
     );
 
@@ -61,7 +61,7 @@ test "test some on Point2D slice" {
     };
 
     const e_x = Point2D{ .x = 1, .y = 0 };
-    const some_orthogonal = someSlice(Point2D, &slice, orthogonal, .{e_x});
+    const some_orthogonal = someSlice(orthogonal, &slice, .{e_x});
 
     try testing.expect(some_orthogonal);
 }
@@ -73,9 +73,8 @@ test "test some array list" {
     defer arr.deinit();
 
     const found = someArrayList(
-        i32,
-        arr,
         CommonPredicates.even(i32),
+        arr,
         .{},
     );
 
@@ -92,7 +91,7 @@ test "test every on Point2D array list" {
     try arr.append(.{ .x = 0, .y = 4 });
 
     const e_x = Point2D{ .x = 1, .y = 0 };
-    const some_orthogonal = someArrayList(Point2D, arr, orthogonal, .{e_x});
+    const some_orthogonal = someArrayList(orthogonal, arr, .{e_x});
 
     try testing.expect(some_orthogonal);
 }

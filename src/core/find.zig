@@ -2,13 +2,14 @@ const std = @import("std");
 const testing = std.testing;
 const common = @import("../common.zig");
 const rangeArrayList = @import("../util.zig").rangeArrayList;
+const type_util = @import("type_util.zig");
 
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
 
 /// Find and retrieve first item that predicate `pred` evaluates to true in slice of type `T`.
 /// Additionally supply some arguments to `pred`.
-pub fn findSlice(comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) ?T {
+pub fn findSlice(comptime pred: anytype, slice: []const type_util.funcParamType(pred, 0), args: anytype) ?type_util.funcParamType(pred, 0) {
     for (slice[0..]) |item| {
         if (@call(.auto, pred, .{item} ++ args)) {
             return item;
@@ -20,7 +21,7 @@ pub fn findSlice(comptime T: type, slice: []const T, comptime pred: anytype, arg
 
 /// Find and retrieve first item that predicate `pred` evaluates to true in array list of type `T`.
 /// Additionally supply some arguments to `pred`.
-pub fn findArrayList(comptime T: type, arr: ArrayList(T), comptime pred: anytype, args: anytype) ?T {
+pub fn findArrayList(comptime pred: anytype, arr: ArrayList(type_util.funcParamType(pred, 0)), args: anytype) ?type_util.funcParamType(pred, 0) {
     for (arr.items) |item| {
         if (@call(.auto, pred, .{item} ++ args)) {
             return item;
@@ -45,20 +46,18 @@ test "test find slice" {
     };
 
     const found = findSlice(
-        Point2D,
+        CommonPredicates.fieldEq(Point2D, .x, 2),
         &slice,
-        CommonPredicates.fieldEq(Point2D, i32),
-        .{ "x", 2 },
+        .{},
     );
 
     try testing.expect(found != null);
     try testing.expectEqual(found.?, slice[2]);
 
     const not_found = findSlice(
-        Point2D,
+        CommonPredicates.fieldEq(Point2D, .y, 5),
         &slice,
-        CommonPredicates.fieldEq(Point2D, i32),
-        .{ "y", 5 },
+        .{},
     );
 
     try testing.expect(not_found == null);
@@ -71,20 +70,18 @@ test "test find array list" {
     defer arr.deinit();
 
     const found = findArrayList(
-        i32,
+        CommonPredicates.eq(i32, 2),
         arr,
-        CommonPredicates.eq(i32),
-        .{2},
+        .{},
     );
 
     try testing.expect(found != null);
     try testing.expectEqual(found.?, arr.items[2]);
 
     const not_found = findArrayList(
-        i32,
+        CommonPredicates.eq(i32, 5),
         arr,
-        CommonPredicates.eq(i32),
-        .{5},
+        .{},
     );
 
     try testing.expect(not_found == null);

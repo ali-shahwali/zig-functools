@@ -46,7 +46,7 @@ pub fn Thread(comptime T: type) type {
                     .slice = self.slice,
                 };
             }
-            core.mapMutSlice(T, self.slice, func, args);
+            core.mapSlice(func, self.slice, args);
 
             return .{
                 .allocator = self.allocator,
@@ -63,7 +63,7 @@ pub fn Thread(comptime T: type) type {
                     .allocator = self.allocator,
                 };
             }
-            const filtered = core.filterSlice(self.allocator, T, self.slice, pred, args) catch |err| {
+            const filtered = core.filterSlice(self.allocator, pred, self.slice, args) catch |err| {
                 return .{
                     .slice = self.slice,
                     .err = err,
@@ -82,12 +82,12 @@ pub fn Thread(comptime T: type) type {
         }
 
         /// Perform reduce, returns result from reducing and deinits thread making it unusable.
-        pub fn reduce(self: *const Self, comptime func: anytype, args: anytype, initial_value: T) !T {
+        pub fn reduce(self: *const Self, comptime reducer: anytype, args: anytype, initial_value: T) !T {
             defer self.deinit();
             if (self.err) |err| {
                 return err;
             }
-            return core.reduceSlice(T, self.slice, func, args, initial_value);
+            return core.reduceSlice(reducer, self.slice, args, initial_value);
         }
 
         /// Perform some, returns result from some and deinits thread making it unusable.
@@ -96,7 +96,7 @@ pub fn Thread(comptime T: type) type {
             if (self.err) |err| {
                 return err;
             }
-            return core.someSlice(T, self.slice, pred, args);
+            return core.someSlice(pred, self.slice, args);
         }
 
         /// Perform every, returns result from every and deinits thread making it unusable.
@@ -105,7 +105,7 @@ pub fn Thread(comptime T: type) type {
             if (self.err) |err| {
                 return err;
             }
-            return core.everySlice(T, self.slice, pred, args);
+            return core.everySlice(pred, self.slice, args);
         }
 
         /// Perform find, returns result from find and deinits thread making it unusable.
@@ -114,7 +114,7 @@ pub fn Thread(comptime T: type) type {
             if (self.err) |err| {
                 return err;
             }
-            return core.findSlice(T, self.slice, pred, args);
+            return core.findSlice(pred, self.slice, args);
         }
 
         /// Returns current result, user of function must make sure to free returned slice.
@@ -199,7 +199,7 @@ test "test threading map->filter->find" {
         .init(allocator, slice)
         .map(CommonMappers.inc(i32), .{})
         .filter(CommonPredicates.odd(i32), .{})
-        .find(CommonPredicates.eq(i32), .{@as(i32, 9)});
+        .find(CommonPredicates.eq(i32, 9), .{});
 
     try testing.expect(nine != null);
     try testing.expect(nine.? == 9);

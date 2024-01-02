@@ -2,15 +2,17 @@ const std = @import("std");
 const testing = std.testing;
 const common = @import("../common.zig");
 const range = @import("../util/range.zig");
+const type_util = @import("./type_util.zig");
 
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
 
-/// Map over slice of type `T` to new allocated slice using function `func` on each element of `slice`.
+/// Map over slice to new allocated slice using function `func` on each element of `slice`.
 /// Additionally supply some arguments to `func`.
 /// Consumer of function must make sure to free returned slice.
-pub fn mapSlice(allocator: Allocator, comptime T: type, slice: []const T, comptime func: anytype, args: anytype) ![]@typeInfo(@TypeOf(func)).Fn.return_type.? {
-    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type.?;
+pub fn mapAllocSlice(allocator: Allocator, comptime func: anytype, slice: []const type_util.funcParamType(func, 0), args: anytype) ![]type_util.funcReturnType(func) {
+    const ReturnType = type_util.funcReturnType(func);
+
     var mapped_slice = try allocator.alloc(ReturnType, slice.len);
     for (0..slice.len) |idx| {
         mapped_slice[idx] = @call(.auto, func, .{slice[idx]} ++ args);
@@ -19,17 +21,18 @@ pub fn mapSlice(allocator: Allocator, comptime T: type, slice: []const T, compti
     return mapped_slice;
 }
 
-/// Map over mutable slice of type `T` using function `func` on each element of `slice`.
-/// Additionally supply some arguments to `func`,
-pub fn mapMutSlice(comptime T: type, slice: []T, comptime func: anytype, args: anytype) void {
+/// Map over mutable slice using function `func` on each element of `slice`.
+/// Additionally supply some arguments to `func`. Does not allocate new memory and instead assigns
+/// mapped values in place.
+pub fn mapSlice(comptime func: anytype, slice: []type_util.funcParamType(func, 0), args: anytype) void {
     for (0..slice.len) |idx| {
         slice[idx] = @call(.auto, func, .{slice[idx]} ++ args);
     }
 }
 
-/// Map over array list of type `T` using function `func` on each element of `slice`.
+/// Map over array list using function `func` on each element of `slice`.
 /// Additionally supply some arguments to `func`,
-pub fn mapArrayList(comptime T: type, arr: ArrayList(T), comptime func: anytype, args: anytype) void {
+pub fn mapArrayList(comptime func: anytype, arr: ArrayList(type_util.funcParamType(func, 0)), args: anytype) void {
     for (0..arr.items.len) |idx| {
         arr.items[idx] = @call(.auto, func, .{arr.items[idx]} ++ args);
     }
@@ -38,8 +41,8 @@ pub fn mapArrayList(comptime T: type, arr: ArrayList(T), comptime func: anytype,
 /// Map over array list of type `T` using function `func` on each element of `arr`,
 /// returns a new allocated array list with mapped elements.
 /// Additionally supply some arguments to `func`,
-pub fn mapAllocArrayList(allocator: Allocator, comptime T: type, arr: ArrayList(T), comptime func: anytype, args: anytype) !ArrayList(@typeInfo(@TypeOf(func)).Fn.return_type.?) {
-    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type.?;
+pub fn mapAllocArrayList(allocator: Allocator, comptime func: anytype, arr: ArrayList(type_util.funcParamType(func, 0)), args: anytype) !ArrayList(type_util.funcReturnType(func)) {
+    const ReturnType = type_util.funcReturnType(func);
 
     var mapped_list = try ArrayList(ReturnType).initCapacity(allocator, arr.capacity);
     for (0..arr.items.len) |idx| {
@@ -59,12 +62,12 @@ const Point2D = struct {
 test "test map on slice of type i32 to slice of type i64" {
     const allocator = testing.allocator;
 
-    const slice = &[3]i32{ 1, 2, 3 };
-    const incremented = try mapSlice(allocator, i32, slice, (struct {
+    const slice = [3]i32{ 1, 2, 3 };
+    const incremented = try mapAllocSlice(allocator, (struct {
         fn inci64(n: i32) i64 {
             return @as(i64, n + 1);
         }
-    }).inci64, .{});
+    }).inci64, &slice, .{});
     defer allocator.free(incremented);
 
     try testing.expectEqualSlices(i64, incremented, &[_]i64{ 2, 3, 4 });
@@ -76,12 +79,7 @@ test "test map mutable slice on i32 slice without args" {
     var slice = try range.rangeSlice(allocator, i32, 3);
     defer allocator.free(slice);
 
-    mapMutSlice(
-        i32,
-        slice,
-        CommonMappers.inc(i32),
-        .{},
-    );
+    mapSlice(CommonMappers.inc(i32), slice, .{});
 
     try testing.expectEqualSlices(i32, slice, &[_]i32{ 1, 2, 3 });
 }
@@ -89,12 +87,11 @@ test "test map mutable slice on i32 slice without args" {
 test "test map slice on i32 slice with args" {
     const allocator = testing.allocator;
     const slice = &[_]i32{ 1, 2, 3 };
-    const added: []i32 = try mapSlice(
+    const added: []i32 = try mapAllocSlice(
         allocator,
-        i32,
+        CommonMappers.add(i32, 1),
         slice,
-        CommonMappers.add(i32),
-        .{@as(i32, 1)},
+        .{},
     );
     defer allocator.free(added);
 
@@ -104,11 +101,10 @@ test "test map slice on i32 slice with args" {
 test "test map slice on f32 slice with trunc" {
     const allocator = testing.allocator;
     const slice = &[_]f32{ 1.9, 2.01, 3.999, 4.5 };
-    const trunced: []f32 = try mapSlice(
+    const trunced: []f32 = try mapAllocSlice(
         allocator,
-        f32,
-        slice,
         CommonMappers.trunc(f32),
+        slice,
         .{},
     );
     defer allocator.free(trunced);
@@ -119,12 +115,11 @@ test "test map slice on f32 slice with trunc" {
 test "test map slice on Point2D slice with takeField mapper" {
     const allocator = testing.allocator;
     const slice = &[_]Point2D{ .{ .x = 1, .y = 2 }, .{ .x = 2, .y = 3 }, .{ .x = 3, .y = 4 } };
-    const x_coords: []i32 = try mapSlice(
+    const x_coords: []i32 = try mapAllocSlice(
         allocator,
-        Point2D,
+        CommonMappers.takeField(Point2D, .x),
         slice,
-        CommonMappers.takeField(Point2D, i32),
-        .{"x"},
+        .{},
     );
     defer allocator.free(x_coords);
 
@@ -136,10 +131,8 @@ test "test map i32 slice to Point2D slice" {
     const slice = try range.rangeSlice(allocator, i32, 3);
     defer allocator.free(slice);
 
-    const points: []Point2D = try mapSlice(
+    const points: []Point2D = try mapAllocSlice(
         allocator,
-        i32,
-        slice,
         (struct {
             fn toPoint2D(n: i32) Point2D {
                 return Point2D{
@@ -148,6 +141,7 @@ test "test map i32 slice to Point2D slice" {
                 };
             }
         }).toPoint2D,
+        slice,
         .{},
     );
     defer allocator.free(points);
@@ -165,7 +159,7 @@ test "test map i32 array list" {
     var arr = try range.rangeArrayList(allocator, i32, 4);
     defer arr.deinit();
 
-    mapArrayList(i32, arr, CommonMappers.inc(i32), .{});
+    mapArrayList(CommonMappers.inc(i32), arr, .{});
     try testing.expectEqualSlices(i32, arr.items, &[_]i32{ 1, 2, 3, 4 });
 }
 
@@ -177,8 +171,6 @@ test "test map i32 array list to Point2D slice" {
 
     const points: ArrayList(Point2D) = try mapAllocArrayList(
         allocator,
-        i32,
-        arr,
         (struct {
             fn toPoint2D(n: i32) Point2D {
                 return Point2D{
@@ -187,6 +179,7 @@ test "test map i32 array list to Point2D slice" {
                 };
             }
         }).toPoint2D,
+        arr,
         .{},
     );
     defer points.deinit();
@@ -196,4 +189,22 @@ test "test map i32 array list to Point2D slice" {
         .{ .x = 1, .y = 0 },
         .{ .x = 2, .y = 0 },
     });
+}
+
+test "test map slice on f32 slice with sin" {
+    const allocator = testing.allocator;
+    const slice = &[_]f32{ std.math.pi, 2 * std.math.pi, 1.5 * std.math.pi };
+
+    const sined = try mapAllocSlice(
+        allocator,
+        CommonMappers.sin(f32),
+        slice,
+        .{},
+    );
+    defer allocator.free(sined);
+
+    // For precision errors
+    mapSlice(CommonMappers.trunc(f32), sined, .{});
+
+    try testing.expectEqualSlices(f32, sined, &[_]f32{ 0, 0, -1 });
 }

@@ -75,16 +75,15 @@ pub fn Sequence(comptime T: type) type {
 
         /// Map over sequence
         pub fn map(self: *const Self, comptime func: anytype, args: anytype) void {
-            core.mapArrayList(T, self.seq, func, args);
+            core.mapArrayList(func, self.seq, args);
         }
 
         /// Filter sequence
         pub fn filter(self: *Self, comptime pred: anytype, args: anytype) !void {
             var filtered = try core.filterArrayList(
                 self.allocator,
-                T,
-                self.seq,
                 pred,
+                self.seq,
                 args,
             );
 
@@ -96,9 +95,8 @@ pub fn Sequence(comptime T: type) type {
         /// Reduce sequence
         pub fn reduce(self: *Self, comptime reducer: anytype, args: anytype, initial_value: T) T {
             return core.reduceArrayList(
-                T,
-                self.seq,
                 reducer,
+                self.seq,
                 args,
                 initial_value,
             );
@@ -106,17 +104,17 @@ pub fn Sequence(comptime T: type) type {
 
         /// Returns true if some item in sequence satisfies predicate
         pub fn some(self: *Self, comptime pred: anytype, args: anytype) bool {
-            return core.someArrayList(T, self.seq, pred, args);
+            return core.someArrayList(pred, self.seq, args);
         }
 
         /// Returns true if every item in sequence satisfies predicate
         pub fn every(self: *Self, comptime pred: anytype, args: anytype) bool {
-            return core.everyArrayList(T, self.seq, pred, args);
+            return core.everyArrayList(pred, self.seq, args);
         }
 
         /// Find first item in sequence that satisfies predicate.
         pub fn find(self: *Self, comptime pred: anytype, args: anytype) ?T {
-            return core.findArrayList(T, self.seq, pred, args);
+            return core.findArrayList(pred, self.seq, args);
         }
 
         /// Conjoin sequence with another sequence
@@ -169,7 +167,7 @@ test "test map and conjoin sequence" {
     var seq2 = try Sequence(i32).fromSlice(allocator, s2);
     defer seq2.deinit();
 
-    seq2.map(CommonMappers.add(i32), .{5});
+    seq2.map(CommonMappers.add(i32, 5), .{});
 
     try seq1.conj(seq2);
     try seq1.filter(common.CommonPredicates.even(i32), .{});
@@ -188,7 +186,7 @@ test "test append sequence" {
 
     try seq.append(5);
 
-    const some = seq.some(CommonPredicates.eq(i32), .{5});
+    const some = seq.some(CommonPredicates.eq(i32, 5), .{});
 
     try testing.expect(some);
 }

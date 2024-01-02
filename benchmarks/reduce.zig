@@ -9,9 +9,8 @@ const TEST_SIZE = 900000000;
 
 fn withReduce(data: []const i64) i64 {
     return functools.reduceSlice(
-        i64,
-        data,
         functools.CommonReducers.sum(i64),
+        data,
         .{},
         0,
     );

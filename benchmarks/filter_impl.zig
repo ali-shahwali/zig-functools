@@ -47,11 +47,10 @@ fn withAllocFilter(allocator: std.mem.Allocator, data: []i32) void {
 }
 
 fn withListFilter(allocator: std.mem.Allocator, data: []i32) void {
-    _ = filterSliceWithList(
+    _ = functools.filterSlice(
         allocator,
-        i32,
-        data,
         functools.CommonPredicates.even(i32),
+        data,
         .{},
     ) catch unreachable;
 }

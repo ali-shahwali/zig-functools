@@ -47,7 +47,7 @@ The documentation contains some examples. The tests are also good examples of ho
 ```zig
 test "test map mutable slice on i32 slice without args" {
     var slice = [3]i32{ 1, 2, 3 };
-    functools.mapMutSlice(
+    functools.mapSlice(
         i32,
         &slice,
         functools.CommonMappers.inc(i32),

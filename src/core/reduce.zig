@@ -2,18 +2,19 @@ const std = @import("std");
 const common = @import("../common.zig");
 const range = @import("../util/range.zig");
 const testing = std.testing;
+const type_util = @import("type_util.zig");
 
 const ArrayList = std.ArrayList;
 
 /// Reduce slice of type `T` using function `func`.
 /// Additionally supply some arguments to `func` and an initial value to reduce from.
-pub fn reduceSlice(comptime T: type, slice: []const T, comptime func: anytype, args: anytype, initial_value: @typeInfo(@TypeOf(func)).Fn.return_type.?) @typeInfo(@TypeOf(func)).Fn.return_type.? {
-    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type.?;
+pub fn reduceSlice(comptime reducer: anytype, slice: []const type_util.funcParamType(reducer, 1), args: anytype, initial_value: type_util.funcReturnType(reducer)) type_util.funcReturnType(reducer) {
+    const ReturnType = type_util.funcReturnType(reducer);
 
     var accumulator: ReturnType = initial_value;
 
     for (slice[0..]) |item| {
-        accumulator = @call(.auto, func, .{ accumulator, item } ++ args);
+        accumulator = @call(.auto, reducer, .{ accumulator, item } ++ args);
     }
 
     return accumulator;
@@ -21,13 +22,13 @@ pub fn reduceSlice(comptime T: type, slice: []const T, comptime func: anytype, a
 
 /// Reduce array list of type `T` using function `func`.
 /// Additionally supply some arguments to `func` and an initial value to reduce from.
-pub fn reduceArrayList(comptime T: type, arr: ArrayList(T), comptime func: anytype, args: anytype, initial_value: @typeInfo(@TypeOf(func)).Fn.return_type.?) @typeInfo(@TypeOf(func)).Fn.return_type.? {
-    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type.?;
+pub fn reduceArrayList(comptime reducer: anytype, arr: ArrayList(type_util.funcParamType(reducer, 1)), args: anytype, initial_value: type_util.funcReturnType(reducer)) type_util.funcReturnType(reducer) {
+    const ReturnType = type_util.funcReturnType(reducer);
 
     var accumulator: ReturnType = initial_value;
 
     for (arr.items[0..]) |item| {
-        accumulator = @call(.auto, func, .{ accumulator, item } ++ args);
+        accumulator = @call(.auto, reducer, .{ accumulator, item } ++ args);
     }
 
     return accumulator;
@@ -47,9 +48,8 @@ fn sumPointY(prev: i32, curr: Point2D) i32 {
 test "test reduce slice on i32 slice" {
     const slice = [_]i32{ 1, 2, 3 };
     const result = reduceSlice(
-        i32,
-        &slice,
         CommonReducers.sum(i32),
+        &slice,
         .{},
         0,
     );
@@ -60,9 +60,8 @@ test "test reduce slice on i32 slice" {
 test "test reduce struct field" {
     const slice = [_]Point2D{ .{ .x = 1, .y = 2 }, .{ .x = 2, .y = 3 }, .{ .x = 3, .y = 4 } };
     const result = reduceSlice(
-        Point2D,
-        &slice,
         sumPointY,
+        &slice,
         .{},
         0,
     );
@@ -76,9 +75,8 @@ test "test reduce i32 array list" {
     defer arr.deinit();
 
     const result = reduceArrayList(
-        i32,
-        arr,
         CommonReducers.sum(i32),
+        arr,
         .{},
         0,
     );

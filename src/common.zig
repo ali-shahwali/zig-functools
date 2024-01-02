@@ -1,158 +1,159 @@
 //! This module contains a set of common mapping, reducing and predicate functions.
+const meta = @import("std").meta;
 
 /// Set of common mapping functions.
 pub const CommonMappers = struct {
     /// Increment each number.
     pub fn inc(comptime T: type) fn (item: T) T {
         return (struct {
-            fn apply(item: T) T {
+            fn incFn(item: T) T {
                 return item + 1;
             }
-        }).apply;
+        }).incFn;
     }
 
     /// Decrement each number.
     pub fn dec(comptime T: type) fn (item: T) T {
         return (struct {
-            fn apply(item: T) T {
+            fn decFn(item: T) T {
                 return item - 1;
             }
-        }).apply;
+        }).decFn;
     }
 
-    /// Add `n` to each item. Supply `n` with the args.
-    pub fn add(comptime T: type) fn (item: T, n: T) T {
+    /// Add `n` to each item.
+    pub fn add(comptime T: type, n: anytype) fn (item: T) T {
         return (struct {
-            fn apply(item: T, n: T) T {
+            fn addFn(item: T) T {
                 return item + n;
             }
-        }).apply;
+        }).addFn;
     }
 
-    /// Subtract `n` to each item. Supply `n` with the args.
-    pub fn sub(comptime T: type) fn (item: T, n: T) T {
+    /// Subtract `n` to each item.
+    pub fn sub(comptime T: type, n: anytype) fn (item: T) T {
         return (struct {
-            fn apply(item: T, n: T) T {
+            fn subFn(item: T) T {
                 return item - n;
             }
-        }).apply;
+        }).subFn;
     }
 
-    /// Multiply `n` to each item. Supply `n` with the args.
-    pub fn mul(comptime T: type) fn (item: T, n: T) T {
+    /// Multiply `n` to each item.
+    pub fn mul(comptime T: type, n: anytype) fn (item: T) T {
         return (struct {
-            fn apply(item: T, n: T) T {
+            fn mulFn(item: T) T {
                 return item * n;
             }
-        }).apply;
+        }).mulFn;
     }
 
-    /// Divide `n` to each item. Supply `n` with the args.
-    pub fn div(comptime T: type) fn (item: T, n: T) T {
+    /// Divide `n` to each item.
+    pub fn div(comptime T: type, n: anytype) fn (item: T) T {
         return (struct {
-            fn apply(item: T, n: T) T {
+            fn divFn(item: T) T {
                 return @divExact(item, n);
             }
-        }).apply;
+        }).divFn;
     }
 
     /// Compute the natural logarithm `ln(n)` on each item.
     pub fn log(comptime T: type) fn (item: T) T {
         return (struct {
-            fn apply(item: T) T {
+            fn logFn(item: T) T {
                 return @log(item);
             }
-        }).apply;
+        }).logFn;
     }
 
     /// Compute log base 2 on each item.
     pub fn log2(comptime T: type) fn (item: T) T {
         return (struct {
-            fn apply(item: T) T {
+            fn log2Fn(item: T) T {
                 return @log2(item);
             }
-        }).apply;
+        }).log2Fn;
     }
 
     /// Compute log base 10 on each item .
     pub fn log10(comptime T: type) fn (item: T) T {
         return (struct {
-            fn apply(item: T) T {
+            fn log10Fn(item: T) T {
                 return @log10(item);
             }
-        }).apply;
+        }).log10Fn;
     }
 
     /// Compute the sinus value of each item.
     pub fn sin(comptime T: type) fn (item: T) T {
         return (struct {
-            fn apply(item: T) T {
+            fn sinFn(item: T) T {
                 return @sin(item);
             }
-        }).apply;
+        }).sinFn;
     }
 
     /// Compute the cosinus value of each item.
     pub fn cos(comptime T: type) fn (item: T) T {
         return (struct {
-            fn apply(item: T) T {
+            fn cosFn(item: T) T {
                 return @cos(item);
             }
-        }).apply;
+        }).cosFn;
     }
 
     /// Compute the tangent value of each item.
     pub fn tan(comptime T: type) fn (item: T) T {
         return (struct {
-            fn apply(item: T) T {
+            fn tanFn(item: T) T {
                 return @tan(item);
             }
-        }).apply;
+        }).tanFn;
     }
 
     /// Compute the square root of each item.
     pub fn sqrt(comptime T: type) fn (item: T) T {
         return (struct {
-            fn apply(item: T) T {
+            fn sqrtFn(item: T) T {
                 return @sqrt(item);
             }
-        }).apply;
+        }).sqrtFn;
     }
 
     /// Compute largest integral value not greater than given floating point number on each item.
     pub fn floor(comptime T: type) fn (item: T) T {
         return (struct {
-            fn apply(item: T) T {
+            fn floorFn(item: T) T {
                 return @floor(item);
             }
-        }).apply;
+        }).floorFn;
     }
 
     /// Compute smallest integral value not less than given floating point number on each item.
     pub fn ceil(comptime T: type) fn (item: T) T {
         return (struct {
-            fn apply(item: T) T {
+            fn ceilFn(item: T) T {
                 return @ceil(item);
             }
-        }).apply;
+        }).ceilFn;
     }
 
     /// Round each floating point item  to an integer, towards zero.
     pub fn trunc(comptime T: type) fn (item: T) T {
         return (struct {
-            fn apply(item: T) T {
+            fn truncFn(item: T) T {
                 return @trunc(item);
             }
-        }).apply;
+        }).truncFn;
     }
 
     /// Strip item of all but one field supplied by args. The field type must also be provided.
-    pub fn takeField(comptime T: type, comptime FieldType: type) fn (item: T, comptime field: []const u8) FieldType {
+    pub fn takeField(comptime T: type, comptime field: meta.FieldEnum(T)) fn (item: T) meta.FieldType(T, field) {
         return (struct {
-            fn apply(item: T, comptime field: []const u8) FieldType {
-                return @field(item, field);
+            fn takeField(item: T) meta.FieldType(T, field) {
+                return @field(item, @tagName(field));
             }
-        }).apply;
+        }).takeField;
     }
 };
 
@@ -182,99 +183,99 @@ pub const CommonPredicates = struct {
     /// Evalatues `true` if item is even.
     pub fn even(comptime T: type) fn (item: T) bool {
         return (struct {
-            fn apply(item: T) bool {
+            fn evenFn(item: T) bool {
                 return @mod(item, 2) == 0;
             }
-        }).apply;
+        }).evenFn;
     }
 
     /// Evalatues `true` if item is odd.
     pub fn odd(comptime T: type) fn (item: T) bool {
         return (struct {
-            fn apply(item: T) bool {
+            fn oddFn(item: T) bool {
                 return @mod(item, 2) != 0;
             }
-        }).apply;
+        }).oddFn;
     }
 
     /// Evalatues `true` if `item == 0`.
     pub fn zero(comptime T: type) fn (item: T) bool {
         return (struct {
-            fn apply(item: T) bool {
+            fn zeroFn(item: T) bool {
                 return item == 0;
             }
-        }).apply;
+        }).zeroFn;
     }
 
     /// Evalatues `true` if `item != 0`.
     pub fn notZero(comptime T: type) fn (item: T) bool {
         return (struct {
-            fn apply(item: T) bool {
+            fn notZeroFn(item: T) bool {
                 return item != 0;
             }
-        }).apply;
+        }).notZeroFn;
     }
 
-    /// Evalatues `true` if `item` equals that of supplied in args. Only works on primitive types.
-    pub fn eq(comptime T: type) fn (item: T, n: T) bool {
+    /// Evalatues `true` if `item` equals that of `n`.
+    pub fn eq(comptime T: type, n: anytype) fn (item: T) bool {
         return (struct {
-            fn apply(item: T, n: T) bool {
-                return item == n;
+            fn eqFn(item: T) bool {
+                return meta.eql(item, n);
             }
-        }).apply;
+        }).eqFn;
     }
 
-    /// Evalatues `true` if `item` does not equal that of supplied in args. Only works on primitive types.
-    pub fn neq(comptime T: type) fn (item: T, n: T) bool {
+    /// Evalatues `true` if `item` does not equal that of `n`.
+    pub fn neq(comptime T: type, n: anytype) fn (item: T) bool {
         return (struct {
-            fn apply(item: T, n: T) bool {
-                return item != n;
+            fn neqFn(item: T) bool {
+                return !meta.eql(item, n);
             }
-        }).apply;
+        }).neqFn;
     }
 
     /// Evalatues `true` if `item` is `true`.
     pub fn truthy() fn (item: bool) bool {
         return (struct {
-            fn apply(item: bool) bool {
+            fn truthyFn(item: bool) bool {
                 return item;
             }
-        }).apply;
+        }).truthyFn;
     }
 
     /// Evalatues `true` if `item` is `false`.
     pub fn falsy() fn (item: bool) bool {
         return (struct {
-            fn apply(item: bool) bool {
+            fn falsyFn(item: bool) bool {
                 return !item;
             }
-        }).apply;
+        }).falsyFn;
     }
 
     /// Evalatues `true` if `item` is greater than 0.
     pub fn pos(comptime T: type) fn (item: T) bool {
         return (struct {
-            fn apply(item: T) bool {
+            fn posFn(item: T) bool {
                 return item > 0;
             }
-        }).apply;
+        }).posFn;
     }
 
     /// Evalatues `true` if `item` is less than 0.
     pub fn neg(comptime T: type) fn (item: T) bool {
         return (struct {
-            fn apply(item: T) bool {
+            fn negFn(item: T) bool {
                 return item < 0;
             }
-        }).apply;
+        }).negFn;
     }
 
-    /// Evalatues `true` if field supplied in args of `item` equals that of value supplied in args.
-    pub fn fieldEq(comptime T: type, comptime FieldType: type) fn (item: T, comptime field: []const u8, value: FieldType) bool {
+    /// Evalatues `true` if field supplied in args of `item` equals that of `value`.
+    pub fn fieldEq(comptime T: type, comptime field: meta.FieldEnum(T), value: anytype) fn (item: T) bool {
         return (struct {
-            fn apply(item: T, comptime field: []const u8, value: FieldType) bool {
-                return @field(item, field) == value;
+            fn fieldEqFn(item: T) bool {
+                return meta.eql(@field(item, @tagName(field)), value);
             }
-        }).apply;
+        }).fieldEqFn;
     }
 };

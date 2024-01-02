@@ -12,10 +12,9 @@ fn inc(n: i32) i32 {
 }
 
 fn withMapMutSlice(data: []i32) void {
-    functools.mapMutSlice(
-        i32,
-        data,
+    functools.mapSlice(
         functools.CommonMappers.inc(i32),
+        data,
         .{},
     );
 }
@@ -29,7 +28,7 @@ fn withoutMap(data: []i32) void {
 pub fn benchmark(allocator: std.mem.Allocator) !void {
     comptime var cham = Chameleon.init(.Auto);
 
-    print(cham.blue().bold().fmt("Benchmarking mapMutSlice with {d} elements.\n"), .{TEST_SIZE});
+    print(cham.blue().bold().fmt("Benchmarking mapSlice with {d} elements.\n"), .{TEST_SIZE});
 
     const data = try allocator.alloc(i32, TEST_SIZE);
     defer allocator.free(data);
@@ -37,7 +36,7 @@ pub fn benchmark(allocator: std.mem.Allocator) !void {
     @memset(data, 0);
 
     const map_mut_slice_time = util.benchMilli(
-        "With mapSlice",
+        "With mapAllocSlice",
         withMapMutSlice,
         .{data},
     );
@@ -50,7 +49,7 @@ pub fn benchmark(allocator: std.mem.Allocator) !void {
         .{data},
     );
 
-    util.printComparison(i64, "mapMutSlice", map_mut_slice_time, manual_time);
+    util.printComparison(i64, "mapSlice", map_mut_slice_time, manual_time);
 }
 
 pub fn main() !void {

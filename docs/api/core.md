@@ -1,11 +1,11 @@
 # Core API
 
-## mapSlice
+## mapAllocSlice
 
 - **Type**
 
   ```zig
-  fn mapSlice(allocator: Allocator, comptime T: type, slice: []const T, comptime func: anytype, args: anytype) ![]@typeInfo(@TypeOf(func)).Fn.return_type.?
+  fn mapAllocSlice(allocator: Allocator, comptime T: type, slice: []const T, comptime func: anytype, args: anytype) ![]@typeInfo(@TypeOf(func)).Fn.return_type.?
   ```
 
 - **Documentation**
@@ -14,12 +14,12 @@
 
 - **[Source](https://github.com/ali-shahwali/zig-functools/blob/main/src/core/map.zig){target="_self"}**
 
-## mapMutSlice
+## mapSlice
 
 - **Type**
 
   ```zig
-  fn mapMutSlice(comptime T: type, slice: []T, comptime func: anytype, args: anytype) void
+  fn mapSlice(comptime T: type, slice: []T, comptime func: anytype, args: anytype) void
   ```
 
 - **Documentation**

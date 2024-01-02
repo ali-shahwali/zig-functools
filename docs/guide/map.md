@@ -8,7 +8,7 @@ Map is one of the more common and useful operations one frequently does. The bas
 ```zig{3-8}
 test "test map mutable slice on i32 slice without args" {
     var slice = [3]i32{ 1, 2, 3 };
-    functools.mapMutSlice(
+    functools.mapSlice(
         i32,                                // Specify type
         &slice,                             // The slice we want to map over
         functools.CommonMappers.inc(i32),   // Maps i32 n -> i32 n + 1
@@ -22,7 +22,7 @@ test "test map mutable slice on i32 slice without args" {
 `functools.CommonMappers`, `functools.CommonReducers`, `functools.CommonPredicates` are collections of functions that come with the library, it contains many common functions that one uses when programming functionally.
 :::
 
-In most cases we preserve the type when we map, however there are cases when we want to map from one type to another. However, to do this we need to allocate new memory and thus can not use `mapMutSlice`.
+In most cases we preserve the type when we map, however there are cases when we want to map from one type to another. However, to do this we need to allocate new memory and thus can not use `mapSlice`.
 
 **Create 2D points from integers**
 ```zig
@@ -34,7 +34,7 @@ const Point2D = struct {
 test "test map i32 slice to Point2D slice" {
     const allocator = testing.allocator;
     const slice = [_]i32{ 1, 2, 3 };
-    const points: []Point2D = try functools.mapSlice(
+    const points: []Point2D = try functools.mapAllocSlice(
         allocator,
         i32,
         &slice,

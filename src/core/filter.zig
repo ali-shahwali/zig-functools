@@ -2,6 +2,7 @@ const std = @import("std");
 const testing = std.testing;
 const common = @import("../common.zig");
 const rangeArrayList = @import("../util.zig").rangeArrayList;
+const type_util = @import("type_util.zig");
 
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
@@ -9,7 +10,8 @@ const ArrayList = std.ArrayList;
 /// Create new slice filtered from `slice` of type `T` using function `pred` as predicate.
 /// Additionally supply some arguments to `pred`.
 /// Consumer must make sure to free returned slice.
-pub fn filterSlice(allocator: Allocator, comptime T: type, slice: []const T, comptime pred: anytype, args: anytype) ![]T {
+pub fn filterSlice(allocator: Allocator, comptime pred: anytype, slice: []const type_util.funcParamType(pred, 0), args: anytype) ![]type_util.funcParamType(pred, 0) {
+    const T = type_util.funcParamType(pred, 0);
     var filtered_list = try std.ArrayList(T).initCapacity(allocator, slice.len);
 
     for (slice[0..]) |item| {
@@ -24,7 +26,8 @@ pub fn filterSlice(allocator: Allocator, comptime T: type, slice: []const T, com
 /// Create new array list filtered from `arr` of type `T` using function `pred` as predicate.
 /// Additionally supply some arguments to `pred`.
 /// Consumer must make sure to free returned array list.
-pub fn filterArrayList(allocator: Allocator, comptime T: type, arr: ArrayList(T), comptime pred: anytype, args: anytype) !ArrayList(T) {
+pub fn filterArrayList(allocator: Allocator, comptime pred: anytype, arr: ArrayList(type_util.funcParamType(pred, 0)), args: anytype) !ArrayList(type_util.funcParamType(pred, 0)) {
+    const T = type_util.funcParamType(pred, 0);
     var filtered = try ArrayList(T).initCapacity(allocator, arr.capacity);
 
     for (arr.items) |item| {
@@ -48,9 +51,8 @@ test "test filter on i32 slice" {
     const allocator = testing.allocator;
     const even = try filterSlice(
         allocator,
-        i32,
-        &slice,
         CommonPredicates.even(i32),
+        &slice,
         .{},
     );
     defer allocator.free(even);
@@ -63,10 +65,9 @@ test "test filter on Point2D slice" {
     const allocator = testing.allocator;
     const x_coord_eq_2 = try filterSlice(
         allocator,
-        Point2D,
+        CommonPredicates.fieldEq(Point2D, .x, 2),
         &slice,
-        CommonPredicates.fieldEq(Point2D, i32),
-        .{ "x", 2 },
+        .{},
     );
     defer allocator.free(x_coord_eq_2);
 
@@ -83,9 +84,8 @@ test "test filter on i32 array list" {
 
     const even = try filterArrayList(
         allocator,
-        i32,
-        arr,
         CommonPredicates.even(i32),
+        arr,
         .{},
     );
     defer even.deinit();
