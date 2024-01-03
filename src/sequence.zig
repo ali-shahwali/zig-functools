@@ -5,6 +5,7 @@ const core = @import("core.zig");
 const util = @import("util.zig");
 const common = @import("common.zig");
 const Thread = @import("thread.zig").Thread;
+const Threadable = @import("thread.zig").Threadable;
 
 const testing = std.testing;
 const Allocator = std.mem.Allocator;
@@ -206,4 +207,27 @@ test "test thread sequence" {
         .reduce(CommonReducers.sum(i32), .{}, 0);
 
     try testing.expectEqual(res, 30);
+}
+
+test "test threadable interface" {
+    const allocator = testing.allocator;
+    const slice = try util.rangeSlice(allocator, i32, 10);
+    defer allocator.free(slice);
+
+    var seq = try Sequence(i32).fromSlice(allocator, slice);
+    defer seq.deinit();
+
+    const threadables = [_]Threadable(i32){
+        Threadable(i32).init(&seq),
+    };
+
+    for (threadables) |t| {
+        const res = try t
+            .thread()
+            .map(CommonMappers.inc(i32), .{})
+            .filter(CommonPredicates.even(i32), .{})
+            .reduce(CommonReducers.sum(i32), .{}, 0);
+
+        try testing.expectEqual(res, 30);
+    }
 }

@@ -128,6 +128,50 @@ pub fn Thread(comptime T: type) type {
     };
 }
 
+/// VTable specifying the interface for Threadable types.
+/// Threadable types must implement a `thread` fn.
+pub fn Threadable(comptime T: type) type {
+    return struct {
+        ptr: *anyopaque,
+        vtab: *const VTab,
+
+        const Self = @This();
+
+        const VTab = struct {
+            thread: *const fn (ptr: *anyopaque) Thread(T),
+        };
+
+        pub fn thread(self: Self) Thread(T) {
+            return self.vtab.thread(self.ptr);
+        }
+
+        fn validPtr(comptime PtrInfo: std.builtin.Type) bool {
+            return PtrInfo == .Pointer and PtrInfo.Pointer.size == .One and @typeInfo(PtrInfo.Pointer.child) == .Struct;
+        }
+
+        pub fn init(obj_ptr: anytype) Self {
+            const Ptr = @TypeOf(obj_ptr);
+            const PtrInfo = @typeInfo(Ptr);
+
+            std.debug.assert(validPtr(PtrInfo));
+
+            const Impl = struct {
+                fn thread(ptr: *anyopaque) Thread(T) {
+                    const self = @as(Ptr, @ptrCast(@alignCast(ptr)));
+                    return self.thread();
+                }
+            };
+
+            return .{
+                .ptr = obj_ptr,
+                .vtab = &.{
+                    .thread = Impl.thread,
+                },
+            };
+        }
+    };
+}
+
 const CommonMappers = common.CommonMappers;
 const CommonPredicates = common.CommonPredicates;
 const CommonReducers = common.CommonReducers;
