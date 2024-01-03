@@ -7,7 +7,7 @@ const type_util = @import("type_util.zig");
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
 
-/// Find and retrieve first item that predicate `pred` evaluates to true in slice of type `T`.
+/// Find and retrieve first item that predicate `pred` evaluates to true.
 /// Additionally supply some arguments to `pred`.
 pub fn findSlice(comptime pred: anytype, slice: []const type_util.funcParamType(pred, 0), args: anytype) ?type_util.funcParamType(pred, 0) {
     for (slice[0..]) |item| {
@@ -19,7 +19,7 @@ pub fn findSlice(comptime pred: anytype, slice: []const type_util.funcParamType(
     return null;
 }
 
-/// Find and retrieve first item that predicate `pred` evaluates to true in array list of type `T`.
+/// Find and retrieve first item that predicate `pred` evaluates to true in array list.
 /// Additionally supply some arguments to `pred`.
 pub fn findArrayList(comptime pred: anytype, arr: ArrayList(type_util.funcParamType(pred, 0)), args: anytype) ?type_util.funcParamType(pred, 0) {
     for (arr.items) |item| {

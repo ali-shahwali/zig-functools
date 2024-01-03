@@ -7,7 +7,7 @@ const type_util = @import("type_util.zig");
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
 
-/// Returns true if `slice` contains an item of type `T` that passes the predicate specified by `pred`.
+/// Returns true if `slice` contains an item that passes the predicate specified by `pred`.
 /// Additionally supply some arguments to `pred`.
 pub fn someSlice(comptime pred: anytype, slice: []const type_util.funcParamType(pred, 0), args: anytype) bool {
     for (slice[0..]) |item| {
@@ -19,7 +19,7 @@ pub fn someSlice(comptime pred: anytype, slice: []const type_util.funcParamType(
     return false;
 }
 
-/// Returns true if array list contains an item of type `T` that passes the predicate specified by `pred`.
+/// Returns true if array list contains an item that passes the predicate specified by `pred`.
 /// Additionally supply some arguments to `pred`.
 pub fn someArrayList(comptime pred: anytype, arr: ArrayList(type_util.funcParamType(pred, 0)), args: anytype) bool {
     for (arr.items) |item| {

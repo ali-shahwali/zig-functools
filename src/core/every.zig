@@ -7,7 +7,7 @@ const type_util = @import("type_util.zig");
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
 
-/// Returns true if predicate defined by `pred` is true for every element in `slice` of type `T`.
+/// Returns true if predicate defined by `pred` is true for every element in `slice`.
 /// Additionally supply some arguments to `pred`.
 pub fn everySlice(comptime pred: anytype, slice: []const type_util.funcParamType(pred, 0), args: anytype) bool {
     for (slice[0..]) |item| {
@@ -19,7 +19,7 @@ pub fn everySlice(comptime pred: anytype, slice: []const type_util.funcParamType
     return true;
 }
 
-/// Returns true if predicate defined by `pred` is true for every item in array list of type `T`.
+/// Returns true if predicate defined by `pred` is true for every item in array list.
 /// Additionally supply some arguments to `pred`.
 pub fn everyArrayList(comptime pred: anytype, arr: ArrayList(type_util.funcParamType(pred, 0)), args: anytype) bool {
     for (arr.items) |item| {

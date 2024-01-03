@@ -6,8 +6,9 @@ const type_util = @import("type_util.zig");
 
 const ArrayList = std.ArrayList;
 
-/// Reduce slice of type `T` using function `func`.
-/// Additionally supply some arguments to `func` and an initial value to reduce from.
+/// Reduce slice using function `reducer`.
+/// Additionally supply some arguments to `reducer`.
+/// Supply an initial value to reduce from.
 pub fn reduceSlice(comptime reducer: anytype, slice: []const type_util.funcParamType(reducer, 1), args: anytype, initial_value: type_util.funcReturnType(reducer)) type_util.funcReturnType(reducer) {
     const ReturnType = type_util.funcReturnType(reducer);
 
@@ -20,8 +21,9 @@ pub fn reduceSlice(comptime reducer: anytype, slice: []const type_util.funcParam
     return accumulator;
 }
 
-/// Reduce array list of type `T` using function `func`.
-/// Additionally supply some arguments to `func` and an initial value to reduce from.
+/// Reduce array list using function `reducer`.
+/// Additionally supply some arguments to `reducer`.
+/// Supply an initial value to reduce from.
 pub fn reduceArrayList(comptime reducer: anytype, arr: ArrayList(type_util.funcParamType(reducer, 1)), args: anytype, initial_value: type_util.funcReturnType(reducer)) type_util.funcReturnType(reducer) {
     const ReturnType = type_util.funcReturnType(reducer);
 

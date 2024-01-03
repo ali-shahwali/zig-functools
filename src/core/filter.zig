@@ -7,7 +7,7 @@ const type_util = @import("type_util.zig");
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
 
-/// Create new slice filtered from `slice` of type `T` using function `pred` as predicate.
+/// Create new slice filtered from `slice` using function `pred` as predicate.
 /// Additionally supply some arguments to `pred`.
 /// Consumer must make sure to free returned slice.
 pub fn filterSlice(allocator: Allocator, comptime pred: anytype, slice: []const type_util.funcParamType(pred, 0), args: anytype) ![]type_util.funcParamType(pred, 0) {
@@ -23,7 +23,7 @@ pub fn filterSlice(allocator: Allocator, comptime pred: anytype, slice: []const 
     return try filtered_list.toOwnedSlice();
 }
 
-/// Create new array list filtered from `arr` of type `T` using function `pred` as predicate.
+/// Create new array list filtered from `arr` using function `pred` as predicate.
 /// Additionally supply some arguments to `pred`.
 /// Consumer must make sure to free returned array list.
 pub fn filterArrayList(allocator: Allocator, comptime pred: anytype, arr: ArrayList(type_util.funcParamType(pred, 0)), args: anytype) !ArrayList(type_util.funcParamType(pred, 0)) {
