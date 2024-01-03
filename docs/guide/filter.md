@@ -6,13 +6,12 @@ The idea behind filter is to remove some elements from a sequence based on some 
 **Filter even numbers**
 ```zig
 test "test filter on i32 slice" {
-    const slice = [_]i32{ 1, 2, 3, 4, 5 };
+    const slice = &[_]i32{ 1, 2, 3, 4, 5 };
     const allocator = testing.allocator;
-    const even = try functools.filterSlice(
+    const even = try filterSlice(
         allocator,
-        i32,
-        &slice,
         CommonPredicates.even(i32),
+        slice,
         .{},
     );
     defer allocator.free(even);
@@ -23,16 +22,15 @@ test "test filter on i32 slice" {
 One particularly useful use case for filter is the previously mentioned scenario of filtering based on struct field values.
 
 **Filter Point2D based on x coordinate value**
-```zig{8-9}
+```zig
 test "test filter on Point2D slice" {
     const slice = [_]Point2D{ .{ .x = 2, .y = 2 }, .{ .x = 0, .y = 3 }, .{ .x = 2, .y = 4 } };
     const allocator = testing.allocator;
-    const x_coord_eq_2 = try functools.filterSlice(
+    const x_coord_eq_2 = try filterSlice(
         allocator,
-        Point2D,
+        CommonPredicates.fieldEq(Point2D, .x, 2),
         &slice,
-        CommonPredicates.fieldEq(Point2D, i32),
-        .{ "x", 2 }, // The field and value we want to filter on
+        .{},
     );
     defer allocator.free(x_coord_eq_2);
 

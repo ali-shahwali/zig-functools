@@ -5,17 +5,16 @@ Map is one of the more common and useful operations one frequently does. The bas
 
 **Increment all integers in a slice**
 
-```zig{3-8}
+```zig{7}
 test "test map mutable slice on i32 slice without args" {
-    var slice = [3]i32{ 1, 2, 3 };
-    functools.mapSlice(
-        i32,                                // Specify type
-        &slice,                             // The slice we want to map over
-        functools.CommonMappers.inc(i32),   // Maps i32 n -> i32 n + 1
-        .{},                                // Some additional args if needed
-    );
+    const allocator = testing.allocator;
 
-    try testing.expectEqualSlices(i32, &slice, &[_]i32{ 2, 3, 4 });
+    var slice = try range.rangeSlice(allocator, i32, 3);
+    defer allocator.free(slice);
+
+    mapSlice(CommonMappers.inc(i32), slice, .{});
+
+    try testing.expectEqualSlices(i32, slice, &[_]i32{ 1, 2, 3 });
 }
 ```
 ::: details Note
@@ -33,12 +32,11 @@ const Point2D = struct {
 
 test "test map i32 slice to Point2D slice" {
     const allocator = testing.allocator;
-    const slice = [_]i32{ 1, 2, 3 };
-    const points: []Point2D = try functools.mapAllocSlice(
+    const slice = try range.rangeSlice(allocator, i32, 3);
+    defer allocator.free(slice);
+
+    const points: []Point2D = try mapAllocSlice(
         allocator,
-        i32,
-        &slice,
-        // We can use an anonymous struct to quickly define a mapper
         (struct {
             fn toPoint2D(n: i32) Point2D {
                 return Point2D{
@@ -47,15 +45,15 @@ test "test map i32 slice to Point2D slice" {
                 };
             }
         }).toPoint2D,
+        slice,
         .{},
     );
-
     defer allocator.free(points);
 
     try testing.expectEqualSlices(Point2D, points, &[_]Point2D{
+        .{ .x = 0, .y = 0 },
         .{ .x = 1, .y = 0 },
         .{ .x = 2, .y = 0 },
-        .{ .x = 3, .y = 0 },
     });
 }
 ```

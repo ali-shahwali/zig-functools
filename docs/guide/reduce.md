@@ -9,10 +9,9 @@ Reduce is also a very common and useful operation. The idea behind reducing is t
 ```zig
 test "test reduce slice on i32 slice" {
     const slice = [_]i32{ 1, 2, 3 };
-    const result = functools.reduceSlice(
-        i32,
-        &slice,
+    const result = reduceSlice(
         CommonReducers.sum(i32),
+        &slice,
         .{},
         0,
     );
@@ -45,11 +44,15 @@ fn sumPointY(prev: i32, curr: Point2D) i32 {
 }
 
 test "test reduce struct field" {
-    const slice = [_]Point2D{ .{ .x = 1, .y = 2 }, .{ .x = 2, .y = 3 }, .{ .x = 3, .y = 4 } };
-    const result = functools.reduceSlice(
-        Point2D,
-        &slice,
+    const slice = [_]Point2D{
+        .{ .x = 1, .y = 2 },
+        .{ .x = 2, .y = 3 },
+        .{ .x = 3, .y = 4 },
+    };
+    
+    const result = reduceSlice(
         sumPointY,
+        &slice,
         .{},
         0,
     );

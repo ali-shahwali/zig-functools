@@ -19,7 +19,7 @@ test "test some on Point2D slice" {
     };
 
     const e_x = Point2D{ .x = 1, .y = 0 };
-    const some_orthogonal = functools.someSlice(Point2D, &slice, orthogonal, .{e_x});
+    const some_orthogonal = someSlice(orthogonal, &slice, .{e_x});
 
     try testing.expect(some_orthogonal);
 }
@@ -29,13 +29,13 @@ test "test some on Point2D slice" {
 
 ```zig
 test "test every on Point2D slice" {
-    const slice = [_]Point2D{
+    const slice = &[_]Point2D{
         .{ .x = 0, .y = 1 },
         .{ .x = 0, .y = 3 },
-        .{ .x = 1, .y = 4 }, // This one is not orthogonal to (1, 0)
+        .{ .x = 1, .y = 4 }, // Not orthogonal to (1, 0)
     };
     const e_x = Point2D{ .x = 1, .y = 0 };
-    const every_orthogonal = functools.everySlice(Point2D, &slice, orthogonal, .{e_x});
+    const every_orthogonal = everySlice(orthogonal, slice, .{e_x});
 
     try testing.expect(!every_orthogonal);
 }
