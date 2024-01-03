@@ -22,36 +22,40 @@ pub const CommonMappers = struct {
     }
 
     /// Add `n` to each item.
-    pub fn add(comptime T: type, n: anytype) fn (item: T) T {
+    /// `n` must be supplied in `args`.
+    pub fn add(comptime T: type) fn (item: T, n: T) T {
         return (struct {
-            fn addFn(item: T) T {
+            fn addFn(item: T, n: T) T {
                 return item + n;
             }
         }).addFn;
     }
 
     /// Subtract `n` to each item.
-    pub fn sub(comptime T: type, n: anytype) fn (item: T) T {
+    /// `n` must be supplied in `args`.
+    pub fn sub(comptime T: type) fn (item: T, n: T) T {
         return (struct {
-            fn subFn(item: T) T {
+            fn subFn(item: T, n: T) T {
                 return item - n;
             }
         }).subFn;
     }
 
     /// Multiply `n` to each item.
-    pub fn mul(comptime T: type, n: anytype) fn (item: T) T {
+    /// `n` must be supplied in `args`.
+    pub fn mul(comptime T: type) fn (item: T, n: T) T {
         return (struct {
-            fn mulFn(item: T) T {
+            fn mulFn(item: T, n: T) T {
                 return item * n;
             }
         }).mulFn;
     }
 
     /// Divide `n` to each item.
-    pub fn div(comptime T: type, n: anytype) fn (item: T) T {
+    /// `n` must be supplied in `args`.
+    pub fn div(comptime T: type) fn (item: T, n: T) T {
         return (struct {
-            fn divFn(item: T) T {
+            fn divFn(item: T, n: T) T {
                 return @divExact(item, n);
             }
         }).divFn;
@@ -217,37 +221,47 @@ pub const CommonPredicates = struct {
     }
 
     /// Evalatues `true` if `item` equals that of `n`.
-    pub fn eq(comptime T: type, n: anytype) fn (item: T) bool {
+    /// `n` must be supplied in `args`.
+    pub fn eq(comptime T: type) fn (item: T, n: T) bool {
         return (struct {
-            fn eqFn(item: T) bool {
+            fn eqFn(item: T, n: T) bool {
                 return meta.eql(item, n);
             }
         }).eqFn;
     }
 
     /// Evalatues `true` if `item` does not equal that of `n`.
-    pub fn neq(comptime T: type, n: anytype) fn (item: T) bool {
+    /// `n` must be supplied in `args`.
+    pub fn neq(comptime T: type) fn (item: T, n: T) bool {
         return (struct {
-            fn neqFn(item: T) bool {
+            fn neqFn(item: T, n: T) bool {
                 return !meta.eql(item, n);
             }
         }).neqFn;
     }
 
     /// Evalatues `true` if `item` is `true`.
-    pub fn truthy() fn (item: bool) bool {
+    pub fn truthy(comptime T: type) fn (item: T) bool {
         return (struct {
-            fn truthyFn(item: bool) bool {
-                return item;
+            fn truthyFn(item: T) bool {
+                if (item) {
+                    return true;
+                }
+
+                return false;
             }
         }).truthyFn;
     }
 
     /// Evalatues `true` if `item` is `false`.
-    pub fn falsy() fn (item: bool) bool {
+    pub fn falsy(comptime T: type) fn (item: T) bool {
         return (struct {
-            fn falsyFn(item: bool) bool {
-                return !item;
+            fn falsyFn(item: T) bool {
+                if (item) {
+                    return false;
+                }
+
+                return true;
             }
         }).falsyFn;
     }
@@ -271,9 +285,9 @@ pub const CommonPredicates = struct {
     }
 
     /// Evalatues `true` if field supplied in args of `item` equals that of `value`.
-    pub fn fieldEq(comptime T: type, comptime field: meta.FieldEnum(T), value: anytype) fn (item: T) bool {
+    pub fn fieldEq(comptime T: type, comptime field: meta.FieldEnum(T)) fn (item: T, value: meta.FieldType(T, field)) bool {
         return (struct {
-            fn fieldEqFn(item: T) bool {
+            fn fieldEqFn(item: T, value: meta.FieldType(T, field)) bool {
                 return meta.eql(@field(item, @tagName(field)), value);
             }
         }).fieldEqFn;

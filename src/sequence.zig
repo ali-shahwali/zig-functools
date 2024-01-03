@@ -167,7 +167,7 @@ test "test map and conjoin sequence" {
     var seq2 = try Sequence(i32).fromSlice(allocator, s2);
     defer seq2.deinit();
 
-    seq2.map(CommonMappers.add(i32, 5), .{});
+    seq2.map(CommonMappers.add(i32), .{5});
 
     try seq1.conj(seq2);
     try seq1.filter(common.CommonPredicates.even(i32), .{});
@@ -186,7 +186,7 @@ test "test append sequence" {
 
     try seq.append(5);
 
-    const some = seq.some(CommonPredicates.eq(i32, 5), .{});
+    const some = seq.some(CommonPredicates.eq(i32), .{5});
 
     try testing.expect(some);
 }

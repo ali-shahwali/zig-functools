@@ -44,10 +44,10 @@ pub fn main() !void {
     defer allocator.free(set_A);
     defer allocator.free(set_B);
 
-    functools.mapSlice(Vec3, set_A, randVec3, .{});
-    functools.mapSlice(Vec3, set_B, randVec3, .{});
+    functools.mapSlice(randVec3, set_A, .{});
+    functools.mapSlice(randVec3, set_B, .{});
     for (set_A[0..]) |v| {
-        const found = functools.findSlice(Vec3, set_B, Vec3.orthogonal, .{v});
+        const found = functools.findSlice(Vec3.orthogonal, set_B, .{v});
 
         if (found) |ov| {
             print("Found 2 orthogonal vectors\n", .{});

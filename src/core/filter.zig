@@ -65,9 +65,9 @@ test "test filter on Point2D slice" {
     const allocator = testing.allocator;
     const x_coord_eq_2 = try filterSlice(
         allocator,
-        CommonPredicates.fieldEq(Point2D, .x, 2),
+        CommonPredicates.fieldEq(Point2D, .x),
         &slice,
-        .{},
+        .{2},
     );
     defer allocator.free(x_coord_eq_2);
 

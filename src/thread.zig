@@ -199,7 +199,7 @@ test "test threading map->filter->find" {
         .init(allocator, slice)
         .map(CommonMappers.inc(i32), .{})
         .filter(CommonPredicates.odd(i32), .{})
-        .find(CommonPredicates.eq(i32, 9), .{});
+        .find(CommonPredicates.eq(i32), .{9});
 
     try testing.expect(nine != null);
     try testing.expect(nine.? == 9);

@@ -89,9 +89,9 @@ test "test map slice on i32 slice with args" {
     const slice = &[_]i32{ 1, 2, 3 };
     const added: []i32 = try mapAllocSlice(
         allocator,
-        CommonMappers.add(i32, 1),
+        CommonMappers.add(i32),
         slice,
-        .{},
+        .{1},
     );
     defer allocator.free(added);
 

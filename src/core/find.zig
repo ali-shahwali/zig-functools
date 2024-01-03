@@ -46,18 +46,18 @@ test "test find slice" {
     };
 
     const found = findSlice(
-        CommonPredicates.fieldEq(Point2D, .x, 2),
+        CommonPredicates.fieldEq(Point2D, .x),
         &slice,
-        .{},
+        .{2},
     );
 
     try testing.expect(found != null);
     try testing.expectEqual(found.?, slice[2]);
 
     const not_found = findSlice(
-        CommonPredicates.fieldEq(Point2D, .y, 5),
+        CommonPredicates.fieldEq(Point2D, .y),
         &slice,
-        .{},
+        .{5},
     );
 
     try testing.expect(not_found == null);
@@ -70,18 +70,18 @@ test "test find array list" {
     defer arr.deinit();
 
     const found = findArrayList(
-        CommonPredicates.eq(i32, 2),
+        CommonPredicates.eq(i32),
         arr,
-        .{},
+        .{2},
     );
 
     try testing.expect(found != null);
     try testing.expectEqual(found.?, arr.items[2]);
 
     const not_found = findArrayList(
-        CommonPredicates.eq(i32, 5),
+        CommonPredicates.eq(i32),
         arr,
-        .{},
+        .{5},
     );
 
     try testing.expect(not_found == null);
