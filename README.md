@@ -12,8 +12,8 @@ Add the `.functools` dependency to your `build.zig.zon`.
     .version = "x.y.z",
     .dependencies = .{
         .functools = .{
-            .url = "https://github.com/ali-shahwali/zig-functools/archive/refs/tags/v0.0.4.tar.gz",
-            .hash = "1220e7f493ff193754ac6acfbe66163b4a7b1294e83a5d83023cb44edca4812456fd",
+            .url = "https://github.com/ali-shahwali/zig-functools/archive/refs/tags/v0.0.5.tar.gz",
+            .hash = "12204b0e5dc32609df9d25b302fe0dcd3a7077b6f71c6444561839143a8c4c335b90",
         },
     },
 }
@@ -46,15 +46,14 @@ The documentation contains some examples. The tests are also good examples of ho
 
 ```zig
 test "test map mutable slice on i32 slice without args" {
-    var slice = [3]i32{ 1, 2, 3 };
-    functools.mapSlice(
-        i32,
-        &slice,
-        functools.CommonMappers.inc(i32),
-        .{},
-    );
+    const allocator = testing.allocator;
 
-    try testing.expectEqualSlices(i32, &slice, &[_]i32{ 2, 3, 4 });
+    var slice = try range.rangeSlice(allocator, i32, 3);
+    defer allocator.free(slice);
+
+    mapSlice(CommonMappers.inc(i32), slice, .{});
+
+    try testing.expectEqualSlices(i32, slice, &[_]i32{ 1, 2, 3 });
 }
 ```
 
@@ -62,13 +61,12 @@ test "test map mutable slice on i32 slice without args" {
 
 ```zig
 test "test filter on i32 slice" {
-    const slice = [_]i32{ 1, 2, 3, 4, 5 };
+    const slice = &[_]i32{ 1, 2, 3, 4, 5 };
     const allocator = testing.allocator;
-    const even = try functools.filterSlice(
+    const even = try filterSlice(
         allocator,
-        i32,
-        &slice,
-        functools.CommonPredicates.even(i32),
+        CommonPredicates.even(i32),
+        slice,
         .{},
     );
     defer allocator.free(even);
@@ -90,30 +88,30 @@ fn orthogonal(p1: Point2D, p2: Point2D) bool {
 }
 
 test "test every on Point2D slice" {
-    const slice = [_]Point2D{
+    const slice = &[_]Point2D{
         .{ .x = 0, .y = 1 },
         .{ .x = 0, .y = 3 },
-        .{ .x = 1, .y = 4 }, // This one is not orthogonal to (1, 0)
+        .{ .x = 1, .y = 4 }, // Not orthogonal to (1, 0)
     };
     const e_x = Point2D{ .x = 1, .y = 0 };
-    const every_orthogonal = functools.everySlice(Point2D, &slice, orthogonal, .{e_x});
+    const every_orthogonal = everySlice(orthogonal, slice, .{e_x});
 
     try testing.expect(!every_orthogonal);
 }
 ```
 **Thread functions**
 ```zig
-test "test threading map->filter->find" {
+test "test threading map->filter->reduce" {
     const allocator = testing.allocator;
-    const slice = functools.rangeSlice(i32, 10);
+    const slice = try util.rangeSlice(allocator, i32, 10);
+    defer allocator.free(slice);
 
-    const nine = try functools.Thread(i32)
+    const result = try Thread(i32)
         .init(allocator, slice)
         .map(CommonMappers.inc(i32), .{})
-        .filter(CommonPredicates.odd(i32), .{})
-        .find(CommonPredicates.eq(i32), .{@as(i32, 9)});
+        .filter(CommonPredicates.even(i32), .{})
+        .reduce(CommonReducers.sum(i32), .{}, 0);
 
-    try testing.expect(nine != null);
-    try testing.expect(nine.? == 9);
+    try testing.expectEqual(result, 30);
 }
 ```
