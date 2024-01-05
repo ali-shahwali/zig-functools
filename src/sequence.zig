@@ -31,9 +31,7 @@ pub fn Sequence(comptime T: type) type {
         /// Initialize sequence from slice
         pub fn fromSlice(allocator: Allocator, slice: []T) !Self {
             var seq = try ArrayList(T).initCapacity(allocator, slice.len);
-            for (slice[0..]) |v| {
-                seq.appendAssumeCapacity(v);
-            }
+            seq.appendSliceAssumeCapacity(slice);
 
             return .{
                 .allocator = allocator,
@@ -54,13 +52,10 @@ pub fn Sequence(comptime T: type) type {
 
         /// Deinitializes sequence and returns owned slice.
         /// Consumer of function must make sure to free returned slice with the same allocator.
-        pub fn toOwnedSlice(self: *const Self) ![]T {
+        pub fn toOwnedSlice(self: *Self) ![]T {
             defer self.deinit();
 
-            const slice = try self.allocator.alloc(T, self.seq.items.len);
-            @memcpy(slice, self.seq.items);
-
-            return slice;
+            return try self.seq.toOwnedSlice();
         }
 
         /// Returns new cloned sequence
