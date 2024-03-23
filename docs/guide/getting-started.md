@@ -10,10 +10,11 @@ Add the `.functools` dependency to your `build.zig.zon`.
 .{
     .name = "Your project name",
     .version = "x.y.z",
+    .paths = .{""},
     .dependencies = .{
         .functools = .{
-            .url = "https://github.com/ali-shahwali/zig-functools/archive/refs/tags/v0.0.5.tar.gz",
-            .hash = "12204b0e5dc32609df9d25b302fe0dcd3a7077b6f71c6444561839143a8c4c335b90",
+            .url = "https://github.com/ali-shahwali/zig-functools/archive/refs/tags/v0.0.6.tar.gz",
+            .hash = "1220755a56367c5eee41fea101569c15ce250a3e60133108d8d4ec6402f999bdeaf6",
         },
     },
 }
@@ -26,9 +27,9 @@ const functools = b.dependency("functools", .{
         .target = target,
         .optimize = optimize,
     });
-exe.addModule("functools", functools.module("functools"));
+exe.root_module.addImport("functools", functools.module("functools"));
 // Or, if you are building a library
-// lib.addModule("functools", functools.module("functools"));
+// lib.root_module.addImport("functools", functools.module("functools"));
 ```
 
 The library can now be imported as a module.
