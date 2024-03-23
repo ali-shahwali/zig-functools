@@ -53,7 +53,11 @@ pub fn Set(comptime T: type) type {
         }
 
         pub fn size(self: *const Self) usize {
-            return self.set.items.len;
+            return self.set.seq.items.len;
+        }
+
+        pub fn empty(self: *const Self) bool {
+            return self.set.seq.items.len == 0;
         }
 
         pub fn setIntersect(allocator: Allocator, s1: Set(T), s2: Set(T)) !Set(T) {

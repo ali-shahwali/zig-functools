@@ -7,7 +7,7 @@ const Allocator = std.mem.Allocator;
 /// A special case is n <= 0, in which case the same slice will be returned.
 pub fn takeNth(allocator: Allocator, comptime T: type, slice: []const T, n: usize) ![]T {
     if (n <= 0) {
-        var copy = try allocator.alloc(T, slice.len);
+        const copy = try allocator.alloc(T, slice.len);
         @memcpy(copy, slice);
         return copy;
     }

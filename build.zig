@@ -63,8 +63,8 @@ pub fn build(b: *std.Build) void {
     const cham_dep = b.dependency("chameleon", .{});
     const cham = cham_dep.module("chameleon");
 
-    var functools = b.createModule(.{
-        .source_file = .{ .path = "src/functools.zig" },
+    const functools = b.createModule(.{
+        .root_source_file = .{ .path = "src/functools.zig" },
     });
 
     b.modules.put(b.dupe("functools"), functools) catch {
@@ -89,8 +89,8 @@ pub fn build(b: *std.Build) void {
             .target = target,
             .optimize = .ReleaseSafe,
         });
-        bench.addModule("functools", functools);
-        bench.addModule("chameleon", cham);
+        bench.root_module.addImport("functools", functools);
+        bench.root_module.addImport("chameleon", cham);
 
         const bench_run = b.addRunArtifact(bench);
         bench_run_step.dependOn(&bench_run.step);
@@ -105,7 +105,7 @@ pub fn build(b: *std.Build) void {
             .target = target,
             .optimize = optimize,
         });
-        example.addModule("functools", functools);
+        example.root_module.addImport("functools", functools);
 
         const example_run = b.addRunArtifact(example);
         example_run_step.dependOn(&example_run.step);

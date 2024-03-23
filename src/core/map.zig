@@ -76,7 +76,7 @@ test "test map on slice of type i32 to slice of type i64" {
 test "test map mutable slice on i32 slice without args" {
     const allocator = testing.allocator;
 
-    var slice = try range.rangeSlice(allocator, i32, 3);
+    const slice = try range.rangeSlice(allocator, i32, 3);
     defer allocator.free(slice);
 
     mapSlice(CommonMappers.inc(i32), slice, .{});

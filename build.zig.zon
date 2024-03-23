@@ -1,10 +1,11 @@
 .{
     .name = "functools",
-    .version = "0.0.3",
+    .version = "0.0.6",
+    .paths = .{""},
     .dependencies = .{
         .chameleon = .{
-            .url = "https://github.com/tr1ckydev/chameleon/archive/3d7fdd61598edecacd2c53c5ecff76a79abb8661.tar.gz",
-            .hash = "1220018d65a2105db410846019d23fd9966ace9f5cacc2fdec5c1ad4275009b94b70",
+            .url = "https://github.com/tr1ckydev/chameleon/archive/5bdefb2fdf1b190fb1b85e8843a868e42eb73bd1.tar.gz",
+            .hash = "1220a5251fb57d99dc513600498a53d71b8d737e034b16528823d8cd96416004d205",
         },
     },
 }
