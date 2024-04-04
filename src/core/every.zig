@@ -1,15 +1,15 @@
 const std = @import("std");
-const testing = std.testing;
 const common = @import("../common.zig");
+const typed = @import("typed");
 const rangeArrayList = @import("../util.zig").rangeArrayList;
-const type_util = @import("type_util.zig");
 
+const testing = std.testing;
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
 
 /// Returns true if predicate defined by `pred` is true for every element in `slice`.
 /// Additionally supply some arguments to `pred`.
-pub fn everySlice(comptime pred: anytype, slice: []const type_util.funcParamType(pred, 0), args: anytype) bool {
+pub fn everySlice(comptime pred: anytype, slice: []const typed.ParamType(pred, 0), args: anytype) bool {
     for (slice[0..]) |item| {
         if (!@call(.auto, pred, .{item} ++ args)) {
             return false;
@@ -21,7 +21,7 @@ pub fn everySlice(comptime pred: anytype, slice: []const type_util.funcParamType
 
 /// Returns true if predicate defined by `pred` is true for every item in array list.
 /// Additionally supply some arguments to `pred`.
-pub fn everyArrayList(comptime pred: anytype, arr: ArrayList(type_util.funcParamType(pred, 0)), args: anytype) bool {
+pub fn everyArrayList(comptime pred: anytype, arr: ArrayList(typed.ParamType(pred, 0)), args: anytype) bool {
     for (arr.items) |item| {
         if (!@call(.auto, pred, .{item} ++ args)) {
             return false;

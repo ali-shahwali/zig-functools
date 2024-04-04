@@ -63,17 +63,20 @@ pub fn build(b: *std.Build) void {
     const cham_dep = b.dependency("chameleon", .{});
     const cham = cham_dep.module("chameleon");
 
-    const functools = b.createModule(.{
-        .root_source_file = .{ .path = "src/functools.zig" },
-    });
+    const typed_dep = b.dependency("typed", .{});
+    const typed = typed_dep.module("typed");
 
-    b.modules.put(b.dupe("functools"), functools) catch {
-        @panic("Failed to put library in build modules.");
-    };
+    const functools = b.addModule("functools", .{
+        .root_source_file = .{ .path = "src/root.zig" },
+        .imports = &.{.{
+            .name = "typed",
+            .module = typed,
+        }},
+    });
 
     const lib = b.addSharedLibrary(.{
         .name = "functools",
-        .root_source_file = .{ .path = "src/functools.zig" },
+        .root_source_file = .{ .path = "src/root.zig" },
         .target = target,
         .optimize = optimize,
     });
@@ -113,10 +116,13 @@ pub fn build(b: *std.Build) void {
 
     const tests = b.addTest(.{
         .name = "tests",
-        .root_source_file = .{ .path = "src/functools.zig" },
+        .root_source_file = .{ .path = "src/root.zig" },
         .target = target,
         .optimize = optimize,
     });
+
+    tests.root_module.addImport("typed", typed);
+
     const run_tests = b.addRunArtifact(tests);
 
     // Uncomment to create executable for debugging.

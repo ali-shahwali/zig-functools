@@ -1,16 +1,16 @@
 const std = @import("std");
 const common = @import("../common.zig");
 const range = @import("../util/range.zig");
-const testing = std.testing;
-const type_util = @import("type_util.zig");
+const typed = @import("typed");
 
+const testing = std.testing;
 const ArrayList = std.ArrayList;
 
 /// Reduce slice using function `reducer`.
 /// Additionally supply some arguments to `reducer`.
 /// Supply an initial value to reduce from.
-pub fn reduceSlice(comptime reducer: anytype, slice: []const type_util.funcParamType(reducer, 1), args: anytype, initial_value: type_util.funcReturnType(reducer)) type_util.funcReturnType(reducer) {
-    const ReturnType = type_util.funcReturnType(reducer);
+pub fn reduceSlice(comptime reducer: anytype, slice: []const typed.ParamType(reducer, 1), args: anytype, initial_value: typed.ReturnType(reducer)) typed.ReturnType(reducer) {
+    const ReturnType = typed.ReturnType(reducer);
 
     var accumulator: ReturnType = initial_value;
 
@@ -24,8 +24,8 @@ pub fn reduceSlice(comptime reducer: anytype, slice: []const type_util.funcParam
 /// Reduce array list using function `reducer`.
 /// Additionally supply some arguments to `reducer`.
 /// Supply an initial value to reduce from.
-pub fn reduceArrayList(comptime reducer: anytype, arr: ArrayList(type_util.funcParamType(reducer, 1)), args: anytype, initial_value: type_util.funcReturnType(reducer)) type_util.funcReturnType(reducer) {
-    const ReturnType = type_util.funcReturnType(reducer);
+pub fn reduceArrayList(comptime reducer: anytype, arr: ArrayList(typed.ParamType(reducer, 1)), args: anytype, initial_value: typed.ReturnType(reducer)) typed.ReturnType(reducer) {
+    const ReturnType = typed.ReturnType(reducer);
 
     var accumulator: ReturnType = initial_value;
 

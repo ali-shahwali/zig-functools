@@ -7,5 +7,9 @@
             .url = "https://github.com/tr1ckydev/chameleon/archive/5bdefb2fdf1b190fb1b85e8843a868e42eb73bd1.tar.gz",
             .hash = "1220a5251fb57d99dc513600498a53d71b8d737e034b16528823d8cd96416004d205",
         },
+        .typed = .{
+            .url = "https://github.com/ali-shahwali/typed/archive/ca00e7c42e74d40301bef66111d38c70e932bfcc.tar.gz",
+            .hash = "1220cb81d0592db79e9e687a73e204cd7923a910680a3f6e11884ff138d1ad2440b4",
+        },
     },
 }

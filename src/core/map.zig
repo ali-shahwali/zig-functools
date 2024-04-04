@@ -1,17 +1,17 @@
 const std = @import("std");
-const testing = std.testing;
 const common = @import("../common.zig");
 const range = @import("../util/range.zig");
-const type_util = @import("./type_util.zig");
+const typed = @import("typed");
 
+const testing = std.testing;
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
 
 /// Map over slice to new allocated slice using function `func` on each element of `slice`.
 /// Additionally supply some arguments to `func`.
 /// Consumer of function must make sure to free returned slice.
-pub fn mapAllocSlice(allocator: Allocator, comptime func: anytype, slice: []const type_util.funcParamType(func, 0), args: anytype) ![]type_util.funcReturnType(func) {
-    const ReturnType = type_util.funcReturnType(func);
+pub fn mapAllocSlice(allocator: Allocator, comptime func: anytype, slice: []const typed.ParamType(func, 0), args: anytype) ![]typed.ReturnType(func) {
+    const ReturnType = typed.ReturnType(func);
 
     var mapped_slice = try allocator.alloc(ReturnType, slice.len);
     for (0..slice.len) |idx| {
@@ -24,7 +24,7 @@ pub fn mapAllocSlice(allocator: Allocator, comptime func: anytype, slice: []cons
 /// Map over mutable slice using function `func` on each element of `slice`.
 /// Additionally supply some arguments to `func`. Does not allocate new memory and instead assigns
 /// mapped values in place.
-pub fn mapSlice(comptime func: anytype, slice: []type_util.funcParamType(func, 0), args: anytype) void {
+pub fn mapSlice(comptime func: anytype, slice: []typed.ParamType(func, 0), args: anytype) void {
     for (0..slice.len) |idx| {
         slice[idx] = @call(.auto, func, .{slice[idx]} ++ args);
     }
@@ -32,7 +32,7 @@ pub fn mapSlice(comptime func: anytype, slice: []type_util.funcParamType(func, 0
 
 /// Map over array list using function `func` on each element of `slice`.
 /// Additionally supply some arguments to `func`,
-pub fn mapArrayList(comptime func: anytype, arr: ArrayList(type_util.funcParamType(func, 0)), args: anytype) void {
+pub fn mapArrayList(comptime func: anytype, arr: ArrayList(typed.ParamType(func, 0)), args: anytype) void {
     for (0..arr.items.len) |idx| {
         arr.items[idx] = @call(.auto, func, .{arr.items[idx]} ++ args);
     }
@@ -41,8 +41,8 @@ pub fn mapArrayList(comptime func: anytype, arr: ArrayList(type_util.funcParamTy
 /// Map over array list of type `T` using function `func` on each element of `arr`,
 /// returns a new allocated array list with mapped elements.
 /// Additionally supply some arguments to `func`,
-pub fn mapAllocArrayList(allocator: Allocator, comptime func: anytype, arr: ArrayList(type_util.funcParamType(func, 0)), args: anytype) !ArrayList(type_util.funcReturnType(func)) {
-    const ReturnType = type_util.funcReturnType(func);
+pub fn mapAllocArrayList(allocator: Allocator, comptime func: anytype, arr: ArrayList(typed.ParamType(func, 0)), args: anytype) !ArrayList(typed.ReturnType(func)) {
+    const ReturnType = typed.ReturnType(func);
 
     var mapped_list = try ArrayList(ReturnType).initCapacity(allocator, arr.capacity);
     for (0..arr.items.len) |idx| {

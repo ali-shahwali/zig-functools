@@ -5,7 +5,7 @@
 - **Type**
 
   ```zig
-  fn mapAllocSlice(allocator: Allocator, comptime func: anytype, slice: []const type_util.funcParamType(func, 0), args: anytype) ![]type_util.funcReturnType(func)
+  fn mapAllocSlice(allocator: Allocator, comptime func: anytype, slice: []const typed.ParamType(func, 0), args: anytype) ![]typed.ReturnType(func)
   ```
 
 - **Documentation**
@@ -19,7 +19,7 @@
 - **Type**
 
   ```zig
-  fn mapSlice(comptime func: anytype, slice: []type_util.funcParamType(func, 0), args: anytype) void
+  fn mapSlice(comptime func: anytype, slice: []typed.ParamType(func, 0), args: anytype) void
   ```
 
 - **Documentation**
@@ -33,7 +33,7 @@
 - **Type**
 
   ```zig
-  fn mapArrayList(comptime func: anytype, arr: ArrayList(type_util.funcParamType(func, 0)), args: anytype) void
+  fn mapArrayList(comptime func: anytype, arr: ArrayList(typed.ParamType(func, 0)), args: anytype) void
   ```
 
 - **Documentation**
@@ -47,7 +47,7 @@
 - **Type**
 
   ```zig
-  fn mapAllocArrayList(allocator: Allocator, comptime func: anytype, arr: ArrayList(type_util.funcParamType(func, 0)), args: anytype) !ArrayList(type_util.funcReturnType(func))
+  fn mapAllocArrayList(allocator: Allocator, comptime func: anytype, arr: ArrayList(typed.ParamType(func, 0)), args: anytype) !ArrayList(typed.ReturnType(func))
   ```
 
 - **Documentation**
@@ -61,7 +61,7 @@
 - **Type**
 
   ```zig
-  fn reduceSlice(comptime reducer: anytype, slice: []const type_util.funcParamType(reducer, 1), args: anytype, initial_value: type_util.funcReturnType(reducer)) type_util.funcReturnType(reducer)
+  fn reduceSlice(comptime reducer: anytype, slice: []const typed.ParamType(reducer, 1), args: anytype, initial_value: typed.ReturnType(reducer)) typed.ReturnType(reducer)
   ```
 
 - **Documentation**
@@ -75,7 +75,7 @@
 - **Type**
 
   ```zig
-  fn reduceArrayList(comptime reducer: anytype, arr: ArrayList(type_util.funcParamType(reducer, 1)), args: anytype, initial_value: type_util.funcReturnType(reducer)) type_util.funcReturnType(reducer)
+  fn reduceArrayList(comptime reducer: anytype, arr: ArrayList(typed.ParamType(reducer, 1)), args: anytype, initial_value: typed.ReturnType(reducer)) typed.ReturnType(reducer)
   ```
 
 - **Documentation**
@@ -89,7 +89,7 @@
 - **Type**
 
   ```zig
-  fn filterSlice(allocator: Allocator, comptime pred: anytype, slice: []const type_util.funcParamType(pred, 0), args: anytype) ![]type_util.funcParamType(pred, 0)
+  fn filterSlice(allocator: Allocator, comptime pred: anytype, slice: []const typed.ParamType(pred, 0), args: anytype) ![]typed.ParamType(pred, 0)
   ```
 
 - **Documentation**
@@ -103,7 +103,7 @@
 - **Type**
 
   ```zig
-  fn filterArrayList(allocator: Allocator, comptime pred: anytype, arr: ArrayList(type_util.funcParamType(pred, 0)), args: anytype) !ArrayList(type_util.funcParamType(pred, 0))
+  fn filterArrayList(allocator: Allocator, comptime pred: anytype, arr: ArrayList(typed.ParamType(pred, 0)), args: anytype) !ArrayList(typed.ParamType(pred, 0))
   ```
 
 - **Documentation**
@@ -117,7 +117,7 @@
 - **Type**
 
   ```zig
-  fn someSlice(comptime pred: anytype, slice: []const type_util.funcParamType(pred, 0), args: anytype) bool
+  fn someSlice(comptime pred: anytype, slice: []const typed.ParamType(pred, 0), args: anytype) bool
   ```
 
 - **Documentation**
@@ -131,7 +131,7 @@
 - **Type**
 
   ```zig
-  fn someArrayList(comptime pred: anytype, arr: ArrayList(type_util.funcParamType(pred, 0)), args: anytype) bool
+  fn someArrayList(comptime pred: anytype, arr: ArrayList(typed.ParamType(pred, 0)), args: anytype) bool
   ```
 
 - **Documentation**
@@ -145,7 +145,7 @@
 - **Type**
 
   ```zig
-  fn everySlice(comptime pred: anytype, slice: []const type_util.funcParamType(pred, 0), args: anytype) bool
+  fn everySlice(comptime pred: anytype, slice: []const typed.ParamType(pred, 0), args: anytype) bool
   ```
 
 - **Documentation**
@@ -159,7 +159,7 @@
 - **Type**
 
   ```zig
-  fn everyArrayList(comptime pred: anytype, arr: ArrayList(type_util.funcParamType(pred, 0)), args: anytype) bool
+  fn everyArrayList(comptime pred: anytype, arr: ArrayList(typed.ParamType(pred, 0)), args: anytype) bool
   ```
 
 - **Documentation**
@@ -173,7 +173,7 @@
 - **Type**
 
   ```zig
-  fn findSlice(comptime pred: anytype, slice: []const type_util.funcParamType(pred, 0), args: anytype) ?type_util.funcParamType(pred, 0)
+  fn findSlice(comptime pred: anytype, slice: []const typed.ParamType(pred, 0), args: anytype) ?typed.ParamType(pred, 0)
   ```
 
 - **Documentation**
@@ -187,7 +187,7 @@
 - **Type**
 
   ```zig
-  fn findArrayList(comptime pred: anytype, arr: ArrayList(type_util.funcParamType(pred, 0)), args: anytype) ?type_util.funcParamType(pred, 0)
+  fn findArrayList(comptime pred: anytype, arr: ArrayList(typed.ParamType(pred, 0)), args: anytype) ?typed.ParamType(pred, 0)
   ```
 
 - **Documentation**
