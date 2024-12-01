@@ -6,18 +6,8 @@ A Zig library that provides functional programming tools such as map, reduce and
 
 Add the `.functools` dependency to your `build.zig.zon`.
 
-```zig
-.{
-    .name = "Your project name",
-    .version = "x.y.z",
-    .paths = .{""},
-    .dependencies = .{
-        .functools = .{
-            .url = "https://github.com/ali-shahwali/zig-functools/archive/refs/tags/v0.0.6.tar.gz",
-            .hash = "1220755a56367c5eee41fea101569c15ce250a3e60133108d8d4ec6402f999bdeaf6",
-        },
-    },
-}
+```sh
+$ zig fetch --save git+https://github.com/ali-shahwali/zig-functools
 ```
 
 Add this to your `build.zig` inside the `build` function.

@@ -67,7 +67,7 @@ pub fn build(b: *std.Build) void {
     const typed = typed_dep.module("typed");
 
     const functools = b.addModule("functools", .{
-        .root_source_file = .{ .path = "src/root.zig" },
+        .root_source_file = b.path("src/root.zig"),
         .imports = &.{.{
             .name = "typed",
             .module = typed,
@@ -76,7 +76,7 @@ pub fn build(b: *std.Build) void {
 
     const lib = b.addSharedLibrary(.{
         .name = "functools",
-        .root_source_file = .{ .path = "src/root.zig" },
+        .root_source_file = b.path("src/root.zig"),
         .target = target,
         .optimize = optimize,
     });
@@ -88,7 +88,7 @@ pub fn build(b: *std.Build) void {
 
         var bench = b.addExecutable(.{
             .name = config.name,
-            .root_source_file = .{ .path = config.path },
+            .root_source_file = b.path(config.path),
             .target = target,
             .optimize = .ReleaseSafe,
         });
@@ -104,7 +104,7 @@ pub fn build(b: *std.Build) void {
 
         var example = b.addExecutable(.{
             .name = config.name,
-            .root_source_file = .{ .path = config.path },
+            .root_source_file = b.path(config.path),
             .target = target,
             .optimize = optimize,
         });
@@ -116,7 +116,7 @@ pub fn build(b: *std.Build) void {
 
     const tests = b.addTest(.{
         .name = "tests",
-        .root_source_file = .{ .path = "src/root.zig" },
+        .root_source_file = b.path("src/root.zig"),
         .target = target,
         .optimize = optimize,
     });

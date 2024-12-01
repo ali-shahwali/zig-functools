@@ -40,7 +40,7 @@ pub fn main() !void {
     const allocator = arena.allocator();
 
     var set_A = try allocator.alloc(Vec3, TEST_SIZE);
-    var set_B = try allocator.alloc(Vec3, TEST_SIZE);
+    const set_B = try allocator.alloc(Vec3, TEST_SIZE);
     defer allocator.free(set_A);
     defer allocator.free(set_B);
 

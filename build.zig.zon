@@ -4,12 +4,12 @@
     .paths = .{""},
     .dependencies = .{
         .chameleon = .{
-            .url = "https://github.com/tr1ckydev/chameleon/archive/5bdefb2fdf1b190fb1b85e8843a868e42eb73bd1.tar.gz",
-            .hash = "1220a5251fb57d99dc513600498a53d71b8d737e034b16528823d8cd96416004d205",
+            .url = "git+https://github.com/tr1ckydev/chameleon#9724f89ca2e56b33609090a6c6c6c1097844d1ee",
+            .hash = "12208314a762057bf5ed82b26b02cbfcf426066b9920bfdd1ddcb68d1d0c55c45ce3",
         },
         .typed = .{
-            .url = "https://github.com/ali-shahwali/typed/archive/ca00e7c42e74d40301bef66111d38c70e932bfcc.tar.gz",
-            .hash = "1220cb81d0592db79e9e687a73e204cd7923a910680a3f6e11884ff138d1ad2440b4",
+            .url = "git+https://github.com/ali-shahwali/typed#a8dc32f16960d351db2b91a1f9905f7903a62cf0",
+            .hash = "12208209be01b4b9684eaf64fae669b9aaa9337a474c29ca6ecd981632e62d03a28e",
         },
     },
 }
