@@ -3,6 +3,5 @@
 
 pub usingnamespace @import("core.zig");
 pub usingnamespace @import("common.zig");
-pub usingnamespace @import("thread.zig");
 pub usingnamespace @import("util.zig");
 pub usingnamespace @import("sequence.zig");

@@ -28,9 +28,6 @@ The library can now be imported as a module.
 const functools = @import("functools");
 ```
 
-## Documentation
-The documentation can be found [here](https://ali-shahwali.github.io/zig-functools/).
-
 ## Examples
 The documentation contains some examples. The tests are also good examples of how to use the library, below are some simple examples from the tests. <br> <br>
 **Map over slice and increment each element.**
@@ -88,21 +85,5 @@ test "test every on Point2D slice" {
     const every_orthogonal = everySlice(orthogonal, slice, .{e_x});
 
     try testing.expect(!every_orthogonal);
-}
-```
-**Thread functions**
-```zig
-test "test threading map->filter->reduce" {
-    const allocator = testing.allocator;
-    const slice = try util.rangeSlice(allocator, i32, 10);
-    defer allocator.free(slice);
-
-    const result = try Thread(i32)
-        .init(allocator, slice)
-        .map(CommonMappers.inc(i32), .{})
-        .filter(CommonPredicates.even(i32), .{})
-        .reduce(CommonReducers.sum(i32), .{}, 0);
-
-    try testing.expectEqual(result, 30);
 }
 ```

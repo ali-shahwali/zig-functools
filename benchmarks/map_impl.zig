@@ -3,13 +3,13 @@ const Allocator = std.mem.Allocator;
 const time = std.time;
 const print = std.debug.print;
 const util = @import("util.zig");
-const Chameleon = @import("chameleon").Chameleon;
 const functools = @import("functools");
+const typed = @import("typed");
 
 const TEST_SIZE = 90000000;
 
-pub fn mapSliceWithAlloc(allocator: Allocator, comptime T: type, slice: []const T, comptime func: anytype, args: anytype) ![]@typeInfo(@TypeOf(func)).Fn.return_type.? {
-    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type.?;
+pub fn mapSliceWithAlloc(allocator: Allocator, comptime T: type, slice: []const T, comptime func: anytype, args: anytype) ![]typed.ReturnType(func) {
+    const ReturnType = typed.ReturnType(func);
     var mapped_slice = try allocator.alloc(ReturnType, slice.len);
     for (0..slice.len) |idx| {
         mapped_slice[idx] = @call(.auto, func, .{slice[idx]} ++ args);
@@ -18,8 +18,8 @@ pub fn mapSliceWithAlloc(allocator: Allocator, comptime T: type, slice: []const 
     return mapped_slice;
 }
 
-pub fn mapSliceWithArrayList(allocator: Allocator, comptime T: type, slice: []const T, comptime func: anytype, args: anytype) ![]@typeInfo(@TypeOf(func)).Fn.return_type.? {
-    const ReturnType = @typeInfo(@TypeOf(func)).Fn.return_type.?;
+pub fn mapSliceWithArrayList(allocator: Allocator, comptime T: type, slice: []const T, comptime func: anytype, args: anytype) ![]typed.ReturnType(func) {
+    const ReturnType = typed.ReturnType(func);
     var mapped_list = try std.ArrayList(ReturnType).initCapacity(allocator, slice.len);
     for (0..slice.len) |idx| {
         mapped_list.appendAssumeCapacity(@call(.auto, func, .{slice[idx]} ++ args));
@@ -49,9 +49,7 @@ fn withListMap(allocator: std.mem.Allocator, data: []i32) void {
 }
 
 pub fn benchmark(allocator: std.mem.Allocator) !void {
-    comptime var cham = Chameleon.init(.Auto);
-
-    print(cham.blue().bold().fmt("Benchmarking map implementations with {d} elements.\n"), .{TEST_SIZE});
+    print("Benchmarking map implementations with {d} elements.\n", .{TEST_SIZE});
 
     const data = try allocator.alloc(i32, TEST_SIZE);
     defer allocator.free(data);

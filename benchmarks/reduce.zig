@@ -3,7 +3,6 @@ const functools = @import("functools");
 const time = std.time;
 const print = std.debug.print;
 const util = @import("util.zig");
-const Chameleon = @import("chameleon").Chameleon;
 
 const TEST_SIZE = 900000000;
 
@@ -26,9 +25,7 @@ fn withoutReduce(data: []const i64) i64 {
 }
 
 pub fn benchmark(allocator: std.mem.Allocator) !void {
-    comptime var cham = Chameleon.init(.Auto);
-
-    print(cham.blue().bold().fmt("Benchmarking reduceSlice with {d} elements.\n"), .{TEST_SIZE});
+    print("Benchmarking reduceSlice with {d} elements.\n", .{TEST_SIZE});
 
     const data = try allocator.alloc(i64, TEST_SIZE);
     defer allocator.free(data);

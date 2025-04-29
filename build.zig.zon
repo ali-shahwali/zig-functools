@@ -1,15 +1,12 @@
 .{
-    .name = "functools",
+    .name = .functools,
     .version = "0.0.6",
+    .fingerprint = 0x54f110522ca72812,
     .paths = .{""},
     .dependencies = .{
-        .chameleon = .{
-            .url = "git+https://github.com/tr1ckydev/chameleon#9724f89ca2e56b33609090a6c6c6c1097844d1ee",
-            .hash = "12208314a762057bf5ed82b26b02cbfcf426066b9920bfdd1ddcb68d1d0c55c45ce3",
-        },
         .typed = .{
-            .url = "git+https://github.com/ali-shahwali/typed#a8dc32f16960d351db2b91a1f9905f7903a62cf0",
-            .hash = "12208209be01b4b9684eaf64fae669b9aaa9337a474c29ca6ecd981632e62d03a28e",
+            .url = "git+https://github.com/ali-shahwali/typed.git#260d69965829b70ba4cae56e6598efc091ccdee2",
+            .hash = "typed-0.0.1-pJdn0SM_AAD7ChmzSxNyvOVREhMoNONbwcNlvF8t47l0",
         },
     },
 }

@@ -5,7 +5,6 @@ const std = @import("std");
 const util = @import("util.zig");
 const functools = @import("functools");
 const print = std.debug.print;
-const Chameleon = @import("chameleon").Chameleon;
 
 const TEST_SIZE = 90000000;
 
@@ -56,9 +55,7 @@ fn withListFilter(allocator: std.mem.Allocator, data: []i32) void {
 }
 
 pub fn benchmark(allocator: std.mem.Allocator) !void {
-    comptime var cham = Chameleon.init(.Auto);
-
-    print(cham.blue().bold().fmt("Benchmarking filter implementations with {d} elements.\n"), .{TEST_SIZE});
+    print("Benchmarking filter implementations with {d} elements.\n", .{TEST_SIZE});
 
     const data = try functools.rangeSlice(allocator, i32, TEST_SIZE);
     defer allocator.free(data);

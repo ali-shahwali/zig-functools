@@ -4,8 +4,6 @@ const std = @import("std");
 const core = @import("core.zig");
 const util = @import("util.zig");
 const common = @import("common.zig");
-const Thread = @import("thread.zig").Thread;
-const Threadable = @import("thread.zig").Threadable;
 
 const testing = std.testing;
 const Allocator = std.mem.Allocator;
@@ -123,13 +121,6 @@ pub fn Sequence(comptime T: type) type {
         pub fn append(self: *Self, value: T) !void {
             try self.seq.append(value);
         }
-
-        /// Perform threading on sequence. Returns a new thread, user must make sure to
-        /// free the result from threading if it is a slice. Threading does not deinit `self`.
-        /// Note that any operations performed when threading do not modify the sequence.
-        pub fn thread(self: *const Self) Thread(T) {
-            return Thread(T).init(self.allocator, self.seq.items);
-        }
     };
 }
 
@@ -185,44 +176,4 @@ test "test append sequence" {
     const some = seq.some(CommonPredicates.eq(i32), .{5});
 
     try testing.expect(some);
-}
-
-test "test thread sequence" {
-    const allocator = testing.allocator;
-    const slice = try util.rangeSlice(allocator, i32, 10);
-    defer allocator.free(slice);
-
-    var seq = try Sequence(i32).fromSlice(allocator, slice);
-    defer seq.deinit();
-
-    const res = try seq
-        .thread()
-        .map(CommonMappers.inc(i32), .{})
-        .filter(CommonPredicates.even(i32), .{})
-        .reduce(CommonReducers.sum(i32), .{}, 0);
-
-    try testing.expectEqual(res, 30);
-}
-
-test "test threadable interface" {
-    const allocator = testing.allocator;
-    const slice = try util.rangeSlice(allocator, i32, 10);
-    defer allocator.free(slice);
-
-    var seq = try Sequence(i32).fromSlice(allocator, slice);
-    defer seq.deinit();
-
-    const threadables = [_]Threadable(i32){
-        Threadable(i32).init(&seq),
-    };
-
-    for (threadables) |t| {
-        const res = try t
-            .thread()
-            .map(CommonMappers.inc(i32), .{})
-            .filter(CommonPredicates.even(i32), .{})
-            .reduce(CommonReducers.sum(i32), .{}, 0);
-
-        try testing.expectEqual(res, 30);
-    }
 }

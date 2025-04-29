@@ -60,11 +60,7 @@ pub fn build(b: *std.Build) void {
 
     const optimize = b.standardOptimizeOption(.{});
 
-    const cham_dep = b.dependency("chameleon", .{});
-    const cham = cham_dep.module("chameleon");
-
-    const typed_dep = b.dependency("typed", .{});
-    const typed = typed_dep.module("typed");
+    const typed = b.dependency("typed", .{}).module("typed");
 
     const functools = b.addModule("functools", .{
         .root_source_file = b.path("src/root.zig"),
@@ -81,6 +77,8 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    lib.root_module.addImport("typed", typed);
+
     b.installArtifact(lib);
 
     inline for (benchmarks) |config| {
@@ -93,7 +91,7 @@ pub fn build(b: *std.Build) void {
             .optimize = .ReleaseSafe,
         });
         bench.root_module.addImport("functools", functools);
-        bench.root_module.addImport("chameleon", cham);
+        bench.root_module.addImport("typed", typed);
 
         const bench_run = b.addRunArtifact(bench);
         bench_run_step.dependOn(&bench_run.step);

@@ -3,7 +3,6 @@ const functools = @import("functools");
 const time = std.time;
 const print = std.debug.print;
 const util = @import("util.zig");
-const Chameleon = @import("chameleon").Chameleon;
 
 const TEST_SIZE = 90000000;
 
@@ -26,9 +25,7 @@ fn withoutMap(data: []i32) void {
 }
 
 pub fn benchmark(allocator: std.mem.Allocator) !void {
-    comptime var cham = Chameleon.init(.Auto);
-
-    print(cham.blue().bold().fmt("Benchmarking mapSlice with {d} elements.\n"), .{TEST_SIZE});
+    print("Benchmarking mapSlice with {d} elements.\n", .{TEST_SIZE});
 
     const data = try allocator.alloc(i32, TEST_SIZE);
     defer allocator.free(data);

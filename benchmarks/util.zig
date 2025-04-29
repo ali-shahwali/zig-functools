@@ -1,10 +1,9 @@
 //! Some utilities for benchmarking.
 const std = @import("std");
-const Chameleon = @import("chameleon").Chameleon;
 const print = std.debug.print;
 
 pub fn callFn(comptime func: anytype, args: anytype) void {
-    if (@typeInfo(@TypeOf(func)).Fn.return_type.? == void) {
+    if (@typeInfo(@TypeOf(func)).@"fn".return_type.? == void) {
         @call(.always_inline, func, args);
     } else {
         _ = @call(.always_inline, func, args);
@@ -49,11 +48,10 @@ pub fn benchNano(desc: []const u8, comptime func: anytype, args: anytype) i128 {
 
 pub fn printComparison(comptime UnitType: type, method: []const u8, bench1: UnitType, bench2: UnitType) void {
     const diff: f64 = @as(f64, @floatFromInt(bench1)) / @as(f64, @floatFromInt(bench2));
-    comptime var cham = Chameleon.init(.Auto);
     if (diff < 1) {
-        print(cham.green().fmt("{s} incurs a {d:.2}% speedup.\n\n"), .{ method, (1 - diff) * 100 });
+        print("{s} incurs a {d:.2}% speedup.\n\n", .{ method, (1 - diff) * 100 });
     } else {
-        print(cham.red().fmt("{s} incurs a {d:.2}% overhead.\n\n"), .{ method, (diff - 1) * 100 });
+        print("{s} incurs a {d:.2}% overhead.\n\n", .{ method, (diff - 1) * 100 });
     }
 }
 

@@ -14,7 +14,7 @@ const print = std.debug.print;
 
 const TEST_SIZE = 100;
 const SEED = 1827319;
-var prng = std.rand.DefaultPrng.init(SEED);
+var prng = std.Random.DefaultPrng.init(SEED);
 
 const Vec3 = struct {
     x: i64,
