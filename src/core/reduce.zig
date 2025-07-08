@@ -2,41 +2,52 @@ const std = @import("std");
 const common = @import("../common.zig");
 const range = @import("../util/range.zig");
 const typed = @import("typed");
+const adHocPolyT = @import("../polymorphism.zig").adHocPolyT;
 
 const testing = std.testing;
-const ArrayList = std.ArrayList;
+
+fn reduceImpl(comptime T: type, comptime G: type) fn (fn (G, T) G, []T, G) G {
+    return (struct {
+        fn e(reducer: fn (G, T) G, slice: []T, initial_value: G) G {
+            var accumulator: G = initial_value;
+
+            for (slice[0..]) |item| {
+                accumulator = @call(.auto, reducer, .{ accumulator, item });
+            }
+
+            return accumulator;
+        }
+    }).e;
+}
+
+fn reduceIdxImpl(comptime T: type, comptime G: type) fn (fn (G, T, usize) G, []T, G) G {
+    return (struct {
+        fn e(reducer: fn (G, T, usize) G, slice: []T, initial_value: G) G {
+            var accumulator: G = initial_value;
+
+            for (slice[0..], 0..) |item, idx| {
+                accumulator = @call(.auto, reducer, .{ accumulator, item, idx });
+            }
+
+            return accumulator;
+        }
+    }).e;
+}
 
 /// Reduce slice using function `reducer`.
-/// Additionally supply some arguments to `reducer`.
 /// Supply an initial value to reduce from.
-pub fn reduceSlice(comptime reducer: anytype, slice: []const typed.ParamType(reducer, 1), args: anytype, initial_value: typed.ReturnType(reducer)) typed.ReturnType(reducer) {
-    const ReturnType = typed.ReturnType(reducer);
-
-    var accumulator: ReturnType = initial_value;
-
-    for (slice[0..]) |item| {
-        accumulator = @call(.auto, reducer, .{ accumulator, item } ++ args);
-    }
-
-    return accumulator;
+pub fn reduce(comptime reducer: anytype, slice: []typed.ParamType(reducer, 1), initial_value: typed.ReturnType(reducer)) typed.ReturnType(reducer) {
+    return adHocPolyT(
+        typed.ReturnType(reducer),
+        .{ reducer, slice, initial_value },
+        .{
+            reduceImpl(typed.ParamType(reducer, 1), typed.ReturnType(reducer)),
+            reduceIdxImpl(typed.ParamType(reducer, 1), typed.ReturnType(reducer)),
+        },
+    );
 }
 
-/// Reduce array list using function `reducer`.
-/// Additionally supply some arguments to `reducer`.
-/// Supply an initial value to reduce from.
-pub fn reduceArrayList(comptime reducer: anytype, arr: ArrayList(typed.ParamType(reducer, 1)), args: anytype, initial_value: typed.ReturnType(reducer)) typed.ReturnType(reducer) {
-    const ReturnType = typed.ReturnType(reducer);
-
-    var accumulator: ReturnType = initial_value;
-
-    for (arr.items[0..]) |item| {
-        accumulator = @call(.auto, reducer, .{ accumulator, item } ++ args);
-    }
-
-    return accumulator;
-}
-
-const CommonReducers = common.CommonReducers;
+const reducers = common.reducers;
 
 const Point2D = struct {
     x: i32,
@@ -48,11 +59,13 @@ fn sumPointY(prev: i32, curr: Point2D) i32 {
 }
 
 test "test reduce slice on i32 slice" {
-    const slice = [_]i32{ 1, 2, 3 };
-    const result = reduceSlice(
-        CommonReducers.sum(i32),
-        &slice,
-        .{},
+    const allocator = testing.allocator;
+    const slice = try allocator.alloc(i32, 3);
+    @memcpy(slice, &[_]i32{ 1, 2, 3 });
+    defer allocator.free(slice);
+    const result = reduce(
+        reducers.sum(i32),
+        slice,
         0,
     );
 
@@ -60,11 +73,13 @@ test "test reduce slice on i32 slice" {
 }
 
 test "test reduce struct field" {
-    const slice = [_]Point2D{ .{ .x = 1, .y = 2 }, .{ .x = 2, .y = 3 }, .{ .x = 3, .y = 4 } };
-    const result = reduceSlice(
+    const allocator = testing.allocator;
+    const slice = try allocator.alloc(Point2D, 3);
+    @memcpy(slice, &[_]Point2D{ .{ .x = 1, .y = 2 }, .{ .x = 2, .y = 3 }, .{ .x = 3, .y = 4 } });
+    defer allocator.free(slice);
+    const result = reduce(
         sumPointY,
-        &slice,
-        .{},
+        slice,
         0,
     );
 
@@ -76,10 +91,9 @@ test "test reduce i32 array list" {
     const arr = try range.rangeArrayList(allocator, i32, 4);
     defer arr.deinit();
 
-    const result = reduceArrayList(
-        CommonReducers.sum(i32),
-        arr,
-        .{},
+    const result = reduce(
+        reducers.sum(i32),
+        arr.items,
         0,
     );
 

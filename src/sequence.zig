@@ -1,8 +1,8 @@
 //! This module contains the Sequence data structure.
 
 const std = @import("std");
-const core = @import("core.zig");
-const util = @import("util.zig");
+const core = @import("core/core.zig");
+const util = @import("util/util.zig");
 const common = @import("common.zig");
 
 const testing = std.testing;
@@ -68,22 +68,19 @@ pub fn Sequence(comptime T: type) type {
         }
 
         /// Map over sequence
-        pub fn map(self: *const Self, comptime func: anytype, args: anytype) void {
-            core.mapArrayList(func, self.seq, args);
+        pub fn map(self: *const Self, comptime func: anytype) void {
+            core.map(func, self.seq.items);
         }
 
         /// Filter sequence
-        pub fn filter(self: *Self, comptime pred: anytype, args: anytype) !void {
-            var filtered = try core.filterArrayList(
+        pub fn filter(self: *Self, comptime pred: anytype) !void {
+            const filtered = try core.filter(
                 self.allocator,
                 pred,
-                self.seq,
-                args,
+                self.seq.items,
             );
-
-            const slice = try filtered.toOwnedSlice();
             self.seq.clearAndFree();
-            self.seq = ArrayList(T).fromOwnedSlice(self.allocator, slice);
+            self.seq = ArrayList(T).fromOwnedSlice(self.allocator, filtered);
         }
 
         /// Reduce sequence
@@ -97,8 +94,8 @@ pub fn Sequence(comptime T: type) type {
         }
 
         /// Returns true if some item in sequence satisfies predicate
-        pub fn some(self: *Self, comptime pred: anytype, args: anytype) bool {
-            return core.someArrayList(pred, self.seq, args);
+        pub fn some(self: *Self, comptime pred: anytype) bool {
+            return core.some(pred, self.seq.items);
         }
 
         /// Returns true if every item in sequence satisfies predicate
@@ -124,9 +121,8 @@ pub fn Sequence(comptime T: type) type {
     };
 }
 
-const CommonMappers = common.CommonMappers;
-const CommonPredicates = common.CommonPredicates;
-const CommonReducers = common.CommonReducers;
+const mappers = common.mappers;
+const predicates = common.predicates;
 
 test "test filter sequence" {
     const allocator = testing.allocator;
@@ -134,7 +130,7 @@ test "test filter sequence" {
     defer allocator.free(slice);
 
     var seq = try Sequence(i32).fromSlice(allocator, slice);
-    try seq.filter(CommonPredicates.even(i32), .{});
+    try seq.filter(predicates.even(i32));
 
     const res = try seq.toOwnedSlice();
     defer allocator.free(res);
@@ -154,10 +150,10 @@ test "test map and conjoin sequence" {
     var seq2 = try Sequence(i32).fromSlice(allocator, s2);
     defer seq2.deinit();
 
-    seq2.map(CommonMappers.add(i32), .{5});
+    seq2.map(mappers.add(i32, 5));
 
     try seq1.conj(seq2);
-    try seq1.filter(common.CommonPredicates.even(i32), .{});
+    try seq1.filter(common.predicates.even(i32));
 
     const res = try seq1.toOwnedSlice();
     defer allocator.free(res);
@@ -173,7 +169,7 @@ test "test append sequence" {
 
     try seq.append(5);
 
-    const some = seq.some(CommonPredicates.eq(i32), .{5});
+    const some = seq.some(predicates.eq(i32, 5));
 
     try testing.expect(some);
 }

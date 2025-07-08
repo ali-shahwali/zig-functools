@@ -1,16 +1,14 @@
 const std = @import("std");
 const functools = @import("functools");
-const time = std.time;
 const print = std.debug.print;
 const util = @import("util.zig");
 
 const TEST_SIZE = 900000000;
 
 fn withReduce(data: []const i64) i64 {
-    return functools.reduceSlice(
-        functools.CommonReducers.sum(i64),
-        data,
-        .{},
+    return functools.reduce(
+        functools.reducers.sum(i64),
+        @constCast(data),
         0,
     );
 }

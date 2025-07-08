@@ -39,7 +39,7 @@ test "test map mutable slice on i32 slice without args" {
     var slice = try range.rangeSlice(allocator, i32, 3);
     defer allocator.free(slice);
 
-    mapSlice(CommonMappers.inc(i32), slice, .{});
+    map(mappers.inc(i32), slice);
 
     try testing.expectEqualSlices(i32, slice, &[_]i32{ 1, 2, 3 });
 }
@@ -49,17 +49,17 @@ test "test map mutable slice on i32 slice without args" {
 
 ```zig
 test "test filter on i32 slice" {
-    const slice = &[_]i32{ 1, 2, 3, 4, 5 };
     const allocator = testing.allocator;
-    const even = try filterSlice(
+    const slice = try rangeSlice(allocator, i32, 6);
+    defer allocator.free(slice);
+    const even = try filter(
         allocator,
-        CommonPredicates.even(i32),
+        predicates.even(i32),
         slice,
-        .{},
     );
     defer allocator.free(even);
 
-    try testing.expectEqualSlices(i32, even, &[_]i32{ 2, 4 });
+    try testing.expectEqualSlices(i32, even, &[_]i32{ 0, 2, 4 });
 }
 ```
 
@@ -71,18 +71,27 @@ const Point2D = struct {
     y: i32,
 };
 
-fn orthogonal(p1: Point2D, p2: Point2D) bool {
-    return (p1.x * p2.x + p1.y * p2.y) == 0;
+fn orthogonal(p2: Point2D) fn (Point2D) bool {
+    return (struct {
+        fn e(p1: Point2D) bool {
+            return (p1.x * p2.x + p1.y * p2.y) == 0;
+        }
+    }).e;
 }
 
 test "test every on Point2D slice" {
-    const slice = &[_]Point2D{
+    const allocator = testing.allocator;
+    const slice = try allocator.alloc(Point2D, 3);
+    @memcpy(slice, &[_]Point2D{
         .{ .x = 0, .y = 1 },
         .{ .x = 0, .y = 3 },
-        .{ .x = 1, .y = 4 }, // Not orthogonal to (1, 0)
-    };
+        // This one is not orthogonal to (1, 0)
+        .{ .x = 1, .y = 4 },
+    });
+    defer allocator.free(slice);
+
     const e_x = Point2D{ .x = 1, .y = 0 };
-    const every_orthogonal = everySlice(orthogonal, slice, .{e_x});
+    const every_orthogonal = every(orthogonal(e_x), slice);
 
     try testing.expect(!every_orthogonal);
 }

@@ -1,6 +1,5 @@
 const std = @import("std");
 const functools = @import("functools");
-const time = std.time;
 const print = std.debug.print;
 const util = @import("util.zig");
 
@@ -11,10 +10,9 @@ fn inc(n: i32) i32 {
 }
 
 fn withMapMutSlice(data: []i32) void {
-    functools.mapSlice(
-        functools.CommonMappers.inc(i32),
+    functools.map(
+        functools.mappers.inc(i32),
         data,
-        .{},
     );
 }
 

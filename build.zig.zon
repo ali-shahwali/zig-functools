@@ -1,6 +1,6 @@
 .{
     .name = .functools,
-    .version = "0.0.6",
+    .version = "0.1.0",
     .fingerprint = 0x54f110522ca72812,
     .paths = .{""},
     .dependencies = .{

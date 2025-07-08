@@ -50,20 +50,11 @@ pub fn rangeArrayList(allocator: Allocator, comptime T: type, n: usize) !ArrayLi
     var list = try ArrayList(T).initCapacity(allocator, n);
     var idx: T = 0;
     for (0..n) |_| {
-        try list.append(idx);
+        list.appendAssumeCapacity(idx);
         idx += 1;
     }
 
     return list;
-}
-
-const Point2D = struct {
-    x: i32,
-    y: i32,
-};
-
-fn orthogonal(p1: Point2D, p2: Point2D) bool {
-    return (p1.x * p2.x + p1.y * p2.y) == 0;
 }
 
 test "test range array" {

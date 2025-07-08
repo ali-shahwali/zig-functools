@@ -2,7 +2,7 @@
 const meta = @import("std").meta;
 
 /// Set of common mapping functions.
-pub const CommonMappers = struct {
+pub const mappers = struct {
     /// Increment each number.
     pub fn inc(comptime T: type) fn (item: T) T {
         return (struct {
@@ -23,9 +23,9 @@ pub const CommonMappers = struct {
 
     /// Add `n` to each item.
     /// `n` must be supplied in `args`.
-    pub fn add(comptime T: type) fn (item: T, n: T) T {
+    pub fn add(comptime T: type, n: T) fn (item: T) T {
         return (struct {
-            fn addFn(item: T, n: T) T {
+            fn addFn(item: T) T {
                 return item + n;
             }
         }).addFn;
@@ -152,7 +152,7 @@ pub const CommonMappers = struct {
     }
 
     /// Strip item of all but one field supplied by args. The field type must also be provided.
-    pub fn takeField(comptime T: type, comptime field: meta.FieldEnum(T)) fn (item: T) meta.FieldType(T, field) {
+    pub fn takeField(comptime T: type, comptime field: meta.FieldEnum(T)) fn (item: T) @FieldType(T, @tagName(field)) {
         return (struct {
             fn takeField(item: T) meta.FieldType(T, field) {
                 return @field(item, @tagName(field));
@@ -162,7 +162,7 @@ pub const CommonMappers = struct {
 };
 
 /// Set of common reducers.
-pub const CommonReducers = struct {
+pub const reducers = struct {
     /// Sum all numbers.
     pub fn sum(comptime T: type) fn (prev: T, curr: T) T {
         return (struct {
@@ -183,7 +183,7 @@ pub const CommonReducers = struct {
 };
 
 /// Set of common predicate functions.
-pub const CommonPredicates = struct {
+pub const predicates = struct {
     /// Evalatues `true` if item is even.
     pub fn even(comptime T: type) fn (item: T) bool {
         return (struct {
@@ -222,9 +222,9 @@ pub const CommonPredicates = struct {
 
     /// Evalatues `true` if `item` equals that of `n`.
     /// `n` must be supplied in `args`.
-    pub fn eq(comptime T: type) fn (item: T, n: T) bool {
+    pub fn eq(comptime T: type, n: T) fn (item: T) bool {
         return (struct {
-            fn eqFn(item: T, n: T) bool {
+            fn eqFn(item: T) bool {
                 return meta.eql(item, n);
             }
         }).eqFn;
@@ -285,9 +285,9 @@ pub const CommonPredicates = struct {
     }
 
     /// Evalatues `true` if field supplied in args of `item` equals that of `value`.
-    pub fn fieldEq(comptime T: type, comptime field: meta.FieldEnum(T)) fn (item: T, value: meta.FieldType(T, field)) bool {
+    pub fn fieldEq(comptime T: type, comptime field: meta.FieldEnum(T), value: @FieldType(T, @tagName(field))) fn (item: T) bool {
         return (struct {
-            fn fieldEqFn(item: T, value: meta.FieldType(T, field)) bool {
+            fn fieldEqFn(item: T) bool {
                 return meta.eql(@field(item, @tagName(field)), value);
             }
         }).fieldEqFn;

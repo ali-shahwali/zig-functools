@@ -27,12 +27,6 @@ const benchmarks = [_]Runnable{
         .path = "benchmarks/filter_impl.zig",
     },
     .{
-        .name = "map-impl",
-        .run_step_name = "bench-map-impl",
-        .description = "Benchmark the 2 different map implementations",
-        .path = "benchmarks/map_impl.zig",
-    },
-    .{
         .name = "all",
         .run_step_name = "bench-all",
         .description = "Run all benchmarks",
